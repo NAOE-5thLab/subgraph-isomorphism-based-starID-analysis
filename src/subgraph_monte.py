@@ -147,7 +147,7 @@ def main(args):
         print(f'{sample_i+1}/{p.sample_N} : E[weight] = {mean}')
     # save
     logger_case_value.save(
-        f'stats_{p.n_obs}_{p.seed}_{p.Vmax}_{p.theta_FOV}_{p.theta_img}_{p.k}_{sampling_type}')
+        f'stats_{p.n_obs}_{p.seed}_{p.Vmax}_{p.theta_FOV*180/np.pi}_{p.theta_img*180/np.pi}_{p.k}_{sampling_type}')
 
 
 def calc_stats(candi_setIDs, obs_setID):
