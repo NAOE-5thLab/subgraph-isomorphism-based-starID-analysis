@@ -33,11 +33,10 @@ class Param:
     sample_N = 10000
     alpha = 0.99
     alpha_sampling = 0.9999
-    # subgraph matching
-    n_obs = 2
 
     def __init__(self, args):
         ### Hyperparameter ###
+        self.n_obs = args.n_obs
         self.Vmax = self.Vmax_list[args.Vmax]
         self.theta_FOV = self.theta_FOV_list[args.theta_FOV]
         self.theta_img = self.theta_img_list[args.theta_img]
@@ -119,25 +118,33 @@ def main(args):
         s_vec = equatorial2vec(RA, DE)
         in_circle = inter_star_angle_vec(center_vec, s_vec) < p.theta_FOV
         ID_in_circle_list = list(I[in_circle])
-        # select stars randomly
-        obs_setID = rand.random_select(
-            p.n_obs, ID_in_circle_list, seed=seeds_one[1])
-        s_array = equatorial2vec(RA[obs_setID], DE[obs_setID])
-        s_list = list(s_array)
-        # add noise on star position
-        s_hat_list, theta_error_list = add_observation_noise(
-            s_list, p, seed=seeds_one[2])
-        ### searching graph ###
-        candi_setIDs = matching_subgraph(
-            p.n_obs, s_hat_list, p.k*p.theta_img, pairstar_db)
-        ### calculation stats ###
-        # weight
-        theta_errors = np.array(theta_error_list)
-        weights = calc_weight(theta_errors, p)
-        weight = np.prod(weights)
-        # stats
-        matching_num, multiple, unique, noexist, included = calc_stats(
-            candi_setIDs, obs_setID)
+        if len(ID_in_circle_list) < p.n_obs:
+            matching_num = None
+            multiple = None
+            unique = None
+            noexist = None
+            included = None
+            weight = None
+        else:
+            # select stars randomly
+            obs_setID = rand.random_select(
+                p.n_obs, ID_in_circle_list, seed=seeds_one[1])
+            s_array = equatorial2vec(RA[obs_setID], DE[obs_setID])
+            s_list = list(s_array)
+            # add noise on star position
+            s_hat_list, theta_error_list = add_observation_noise(
+                s_list, p, seed=seeds_one[2])
+            ### searching graph ###
+            candi_setIDs = matching_subgraph(
+                p.n_obs, s_hat_list, p.k*p.theta_img, pairstar_db)
+            ### calculation stats ###
+            # weight
+            theta_errors = np.array(theta_error_list)
+            weights = calc_weight(theta_errors, p)
+            weight = np.prod(weights)
+            # stats
+            matching_num, multiple, unique, noexist, included = calc_stats(
+                candi_setIDs, obs_setID)
         ### LOGGING ###
         logger_case_value.append(
             [matching_num, multiple, unique, noexist, included, weight])
@@ -167,6 +174,11 @@ def calc_stats(candi_setIDs, obs_setID):
 if __name__ == '__main__':
     # argument
     parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--n_obs",
+        type=int,
+        default=2,
+        help="ganbare")
     parser.add_argument(
         "--Vmax",
         type=int,
