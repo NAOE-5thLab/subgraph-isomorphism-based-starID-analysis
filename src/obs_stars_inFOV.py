@@ -21,7 +21,7 @@ class Param:
 
     ### basic parameter ###
     # system
-    log_dir = './log/'
+    log_dir = './log/obs_stars/'
     seed = 10
     # simulation
     sample_N = 10000

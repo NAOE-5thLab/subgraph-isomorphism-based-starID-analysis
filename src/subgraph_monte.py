@@ -27,10 +27,10 @@ class Param:
 
     ### basic parameter ###
     # system
-    log_dir = './log/'
+    log_dir = './log/subgraph_monte/'
     seed = 10
     # simulation
-    sample_N = 10000
+    sample_N = 10
     alpha = 0.99
     alpha_sampling = 0.9999
 
@@ -57,15 +57,16 @@ def add_observation_noise(s_list, p, seed=100):
     for i, s in enumerate(s_list):
         if sampling_type == 0:
             s_hat, theta_error = rand.von_mises_fisher_3d_sampling(
-                s, p.kappa, seed=seeds_noise[i])
+                s, p.kappa, seed=seeds_noise[i], theta_flag=True)
         elif sampling_type == 1:
             s_hat, theta_error = rand.uniform_limited_spherical_vector(
                 s, p.theta_sampling, seed=seeds_noise[i], theta_flag=True)
         elif sampling_type == 2:
             s_hat, theta_error = rand.von_mises_fisher_3d_sampling(
-                s, p.kappa_sampling, seed=seeds_noise[i])
+                s, p.kappa_sampling, seed=seeds_noise[i], theta_flag=True)
         s_hat_list.append(s_hat)
         theta_error_list.append(theta_error)
+    return s_hat_list, theta_error_list
 
 
 def calc_weight(theta, p):
@@ -150,8 +151,10 @@ def main(args):
             [matching_num, multiple, unique, noexist, included, weight])
         ### RENDERING ###
         logs = logger_case_value.get_array()
-        mean = logs[:, -1].mean()
-        print(f'{sample_i+1}/{p.sample_N} : E[weight] = {mean}')
+        logs = logs[np.all(logs != None, axis=1)]
+        if logs.ndim == 2:
+            mean = logs[:, -1].mean()
+            print(f'{sample_i+1}/{p.sample_N} : E[weight] = {mean}')
     # save
     logger_case_value.save(
         f'stats_{p.n_obs}_{p.seed}_{p.Vmax}_{p.theta_FOV*180/np.pi}_{p.theta_img*180/np.pi}_{p.k}_{sampling_type}')
