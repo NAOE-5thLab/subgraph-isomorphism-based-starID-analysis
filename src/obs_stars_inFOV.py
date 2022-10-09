@@ -68,8 +68,11 @@ def main(args):
 
         ### LOGGING ###
         logger_case_value.append([in_circle_num])
+
+        ### RENDERING ###
+        print(f'{sample_i+1}/{p.sample_N}')
     # save
-    logger_case_value.save(f'obs_stars_{p.Vmax}_{p.theta_FOV}')
+    logger_case_value.save(f'obs_stars_{p.Vmax}_{p.theta_FOV*180/np.pi}')
 
 
 if __name__ == '__main__':
