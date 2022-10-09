@@ -14,8 +14,15 @@ def vec2equatorial(vec):
         z = vec[:, 2]
     # 
     alpha = np.arctan(y/x)
-    alpha[(x<0)*(y>=0)] += np.pi
-    alpha[(x<0)*(y<0)] -= np.pi
+    # 
+    if vec.shape == (3,):
+        if (x<0)*(y>=0):
+            alpha += np.pi
+        elif (x<0)*(y<0):
+            alpha -= np.pi
+    else:
+        alpha[(x<0)*(y>=0)] += np.pi
+        alpha[(x<0)*(y<0)] -= np.pi
     delta = np.pi/2 - np.arccos(z)
     return alpha, delta
 

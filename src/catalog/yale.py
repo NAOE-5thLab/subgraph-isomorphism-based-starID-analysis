@@ -128,7 +128,7 @@ class YaleStarCatalog(Catalog):
 
     def info(self):
         print('----- Yale Bright Star Catalog -----')
-        print(f"the number of stars : {len(self.get_ID())}")
+        print(f"the number of stars : {len(self.get_I())}")
         print(
             f"the range of magnitude : [{min(self.get_Vmag())}, {max(self.get_Vmag())}]")
 
