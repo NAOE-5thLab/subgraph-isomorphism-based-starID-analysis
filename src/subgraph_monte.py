@@ -10,7 +10,7 @@ from utils.seeds import gen_seeds
 from utils.equatorial import equatorial2vec
 from utils.interangle import inter_star_angle_vec
 
-
+ 
 sampling_type = 0
 
 
