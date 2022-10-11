@@ -42,7 +42,8 @@ class StarDB(object):
         return self.Vmag_V
 
     def save_cashe(self):
-        np.savetxt(BASE_DIR + '/cache/starDB_ID.csv', self.HR_V, delimiter=',')
+        np.savetxt(BASE_DIR + '/cache/starDB_I.csv', self.I_V, delimiter=',')
+        np.savetxt(BASE_DIR + '/cache/starDB_HR.csv', self.HR_V, delimiter=',')
         np.savetxt(BASE_DIR + '/cache/starDB_RA.csv', self.RA_V, delimiter=',')
         np.savetxt(BASE_DIR + '/cache/starDB_DE.csv', self.DE_V, delimiter=',')
         np.savetxt(
