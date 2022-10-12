@@ -24,6 +24,7 @@ class IntervalSearch:
 
 class PairStarDB(object):
     def __init__(self, I, RA, DE, theta_FOV=30*np.pi/180):
+        self.I = I
         self.RA = RA
         self.DE = DE
         self.create_catalog(I, RA, DE, theta_FOV)
@@ -46,6 +47,9 @@ class PairStarDB(object):
         print(f"the number of pairs : {len(self.I_pair_FOV)}")
         print(
             f"the range of inter angle [deg.] : [{min(self.Theta_pair_FOV)*180/np.pi}, {max(self.Theta_pair_FOV)*180/np.pi}]")
+
+    def get_I(self):
+        return self.I
 
     def get_RA(self):
         return self.RA
