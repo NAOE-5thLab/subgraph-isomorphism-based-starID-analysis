@@ -6,7 +6,10 @@ from rand.spherical_uniform import uniform_spherical_vector
 
 
 def random_select(n, index, seed=100):
+    #
+    if len(index) < n:
+        n = len(index)
+    #
     random.seed(seed)
     selected_index = random.sample(index, n)
     return selected_index
-

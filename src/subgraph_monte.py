@@ -1,16 +1,18 @@
 import argparse
+import tqdm
+
 import numpy as np
 
 import log
 import catalog
 import db
 import rand
-from detector.subgraph import matching_subgraph
+from detector.subgraph import matching_set_for_analysis
 from utils.seeds import gen_seeds
 from utils.equatorial import equatorial2vec
 from utils.interangle import inter_star_angle_vec
 
- 
+
 sampling_type = 0
 
 
@@ -24,6 +26,7 @@ class Param:
         -5.0, -4.5, -4.0, -3.5, -3.0, -2.5, -2.0, -1.5, -1.0, -0.5, 0.0]]
     # subgraph matching
     k_list = [2.0**i for i in [-1.0, -0.5, 0.0, 0.5, 1.0]]
+    n_obs_max = 10
 
     ### basic parameter ###
     # system
@@ -36,7 +39,6 @@ class Param:
 
     def __init__(self, args):
         ### Hyperparameter ###
-        self.n_obs = args.n_obs
         self.Vmax = self.Vmax_list[args.Vmax]
         self.theta_FOV = self.theta_FOV_list[args.theta_FOV]
         self.theta_img = self.theta_img_list[args.theta_img]
@@ -44,43 +46,44 @@ class Param:
         ### basic parameter ###
         self.kappa = rand.estimate_kappa_von_mises_fisher_3d(
             self.theta_img, self.alpha)
-        self.kappa_sampling = rand.estimate_kappa_von_mises_fisher_3d(
-            self.theta_img, self.alpha_sampling)
         self.theta_sampling = rand.estimate_thata_von_mises_fisher_3d(
             self.kappa, self.alpha_sampling)
+        self.kappa_sampling = rand.estimate_kappa_von_mises_fisher_3d(
+            self.theta_img, self.alpha_sampling)
 
 
-def add_observation_noise(s_list, p, seed=100):
-    seeds_noise = gen_seeds(seed, p.n_obs)
+def add_observation_noise(s_list, kappa, theta_sampling, kappa_sampling, seed=100):
+    seeds_noise = gen_seeds(seed, len(s_list))
+    #
     s_hat_list = []
     theta_error_list = []
     for i, s in enumerate(s_list):
         if sampling_type == 0:
             s_hat, theta_error = rand.von_mises_fisher_3d_sampling(
-                s, p.kappa, seed=seeds_noise[i], theta_flag=True)
+                s, kappa, seed=seeds_noise[i], theta_flag=True)
         elif sampling_type == 1:
             s_hat, theta_error = rand.uniform_limited_spherical_vector(
-                s, p.theta_sampling, seed=seeds_noise[i], theta_flag=True)
+                s, theta_sampling, seed=seeds_noise[i], theta_flag=True)
         elif sampling_type == 2:
             s_hat, theta_error = rand.von_mises_fisher_3d_sampling(
-                s, p.kappa_sampling, seed=seeds_noise[i], theta_flag=True)
+                s, kappa_sampling, seed=seeds_noise[i], theta_flag=True)
         s_hat_list.append(s_hat)
         theta_error_list.append(theta_error)
     return s_hat_list, theta_error_list
 
 
-def calc_weight(theta, p):
+def calc_weight(theta, kappa, theta_sampling, kappa_sampling):
     if sampling_type == 0:
         return 1
     elif sampling_type == 1:
-        numerator = p.kappa * \
-            np.exp(p.kappa*(np.cos(theta)-1)) * (1 - np.cos(p.theta_sampling))
-        denominator = 1 - np.exp(-2*p.kappa)
+        numerator = kappa * \
+            np.exp(kappa*(np.cos(theta)-1)) * (1 - np.cos(theta_sampling))
+        denominator = 1 - np.exp(-2*kappa)
         return numerator/denominator
     elif sampling_type == 2:
-        numerator = p.kappa * (1 - np.exp(-2*p.kappa_sampling))
-        denominator = p.kappa_sampling * (1 - np.exp(-2*p.kappa))
-        return (numerator/denominator) * np.exp((p.kappa - p.kappa_sampling)*(np.cos(theta) - 1))
+        numerator = kappa * (1 - np.exp(-2*kappa_sampling))
+        denominator = kappa_sampling * (1 - np.exp(-2*kappa))
+        return (numerator/denominator) * np.exp((kappa - kappa_sampling)*(np.cos(theta) - 1))
 
 
 def main(args):
@@ -103,73 +106,70 @@ def main(args):
 
     ### Prepair LOGGER ###
     header = [
-        'matching_num', 'multiple', 'unique', 'noexist', 'included', 'weight']
-    logger_case_value = log.Logger(p.log_dir, header)
-    logger_case_value.reset()
+        'observable', 'time', 'matching_num', 'multiple', 'unique', 'noexist', 'included', 'weight']
+    logger_list = []
+    for i in range(p.n_obs_max-1):
+        logger = log.Logger(p.log_dir, header)
+        logger.reset()
+        logger_list.append(logger)
 
     ### MONTE CARLO SIMULATION ###
     # seed
     seeds_monte = gen_seeds(p.seed, p.sample_N)
-    for sample_i in range(p.sample_N):
+    for sample_i in tqdm.tqdm(range(p.sample_N)):
+        # seed
         seeds_one = gen_seeds(seeds_monte[sample_i], 3)
         ### RANDOM SAMPLING ###
         # select center randomly
         center_vec = rand.uniform_spherical_vector(seed=seeds_one[0])
         # collect stars in circle (FOV)
-        s_vec = equatorial2vec(RA, DE)
-        in_circle = inter_star_angle_vec(center_vec, s_vec) < p.theta_FOV
+        in_circle = inter_star_angle_vec(
+            center_vec, equatorial2vec(RA, DE)) < p.theta_FOV
         ID_in_circle_list = list(I[in_circle])
-        if len(ID_in_circle_list) < p.n_obs:
-            matching_num = None
-            multiple = None
-            unique = None
-            noexist = None
-            included = None
-            weight = None
-        else:
-            # select stars randomly
-            obs_setID = rand.random_select(
-                p.n_obs, ID_in_circle_list, seed=seeds_one[1])
-            s_array = equatorial2vec(RA[obs_setID], DE[obs_setID])
-            s_list = list(s_array)
-            # add noise on star position
-            s_hat_list, theta_error_list = add_observation_noise(
-                s_list, p, seed=seeds_one[2])
-            ### searching graph ###
-            candi_setIDs = matching_subgraph(
-                p.n_obs, s_hat_list, p.k*p.theta_img, pairstar_db)
-            ### calculation stats ###
-            # weight
-            theta_errors = np.array(theta_error_list)
-            weights = calc_weight(theta_errors, p)
-            weight = np.prod(weights)
-            # stats
-            matching_num, multiple, unique, noexist, included = calc_stats(
-                candi_setIDs, obs_setID)
-        ### LOGGING ###
-        logger_case_value.append(
-            [matching_num, multiple, unique, noexist, included, weight])
-        ### RENDERING ###
-        logs = logger_case_value.get_array()
-        logs = logs[np.all(logs != None, axis=1)]
-        if logs.ndim == 2:
-            mean = logs[:, -1].mean()
-            print(f'{sample_i+1}/{p.sample_N} : E[weight] = {mean}')
+        # select stars randomly
+        obs_setid = rand.random_select(
+            p.n_obs_max, ID_in_circle_list, seed=seeds_one[1])
+        n_obs_able = len(obs_setid)
+        s_list = list(equatorial2vec(RA[obs_setid], DE[obs_setid]))
+        # add noise on star position
+        s_hat_list, theta_error_list = add_observation_noise(
+            s_list, p.kappa, p.theta_sampling, p.kappa_sampling, seed=seeds_one[2])
+        ### SEARCH GRAPH ###
+        candi_setid_each_list, time_list = matching_set_for_analysis(
+            n_obs_able, s_hat_list, p.k*p.theta_img, pairstar_db)
+        ### CALC STATS and LOGGING ###
+        # weight
+        weights = calc_weight(
+            np.array(theta_error_list), p.kappa, p.theta_sampling, p.kappa_sampling)
+        #
+        for i in range(p.n_obs_max-1):
+            if i+2 <= n_obs_able:
+                # stats
+                matching_num, multiple, unique, noexist, included = calc_stats(
+                    candi_setid_each_list[i], obs_setid)
+                weight = np.prod(weights[:i+2])
+                time = time_list[i-1] - time_list[0]
+                # log
+                logger_list[i].append(
+                    [1, time, matching_num, multiple, unique, noexist, included, weight])
+            else:
+                logger_list[i].append([0, -1, -1, -1, -1, -1, -1, -1])
     # save
-    logger_case_value.save(
-        f'stats_{p.n_obs}_{p.seed}_{p.Vmax}_{p.theta_FOV*180/np.pi}_{p.theta_img*180/np.pi}_{p.k}_{sampling_type}')
+    for i in range(p.n_obs_max-1):
+        logger_list[i].save(
+            f'stats_{p.seed}_{i+2}_{p.Vmax}_{p.theta_FOV*180/np.pi}_{p.theta_img*180/np.pi}_{p.k}_{sampling_type}')
 
 
-def calc_stats(candi_setIDs, obs_setID):
+def calc_stats(candi_setids, obs_setid):
     # matching number
-    matching_num = len(candi_setIDs)
+    matching_num = len(candi_setids)
     multiple = matching_num > 1
     unique = matching_num == 1
     noexist = matching_num == 0
     # correct pair is included in candidate pairs
     included = False
-    for candi_setID in candi_setIDs:
-        if set(obs_setID) == set(candi_setID):
+    for candi_setid in candi_setids:
+        if set(obs_setid) == set(candi_setid):
             included = True
     return matching_num, multiple, unique, noexist, included
 
@@ -177,11 +177,6 @@ def calc_stats(candi_setIDs, obs_setID):
 if __name__ == '__main__':
     # argument
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--n_obs",
-        type=int,
-        default=2,
-        help="ganbare")
     parser.add_argument(
         "--Vmax",
         type=int,

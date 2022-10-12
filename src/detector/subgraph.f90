@@ -4,7 +4,7 @@ module subgraph_isomorphism_starid_detector
 contains
 
     subroutine matching_set_for_analysis(&
-            N_candi_setid, candi_setid, &
+            N_candi_setid, candi_setid, time, &
             n_obs, s_hat_set, epsilon, &
             N_set, RA_set, DE_set, N_pairset, thetaset, pairidset)
         implicit none;
@@ -17,10 +17,12 @@ contains
         integer, intent(in) :: pairidset(N_pairset, 2)
         integer, intent(out) :: N_candi_setid(n_obs-1)
         integer, intent(out) :: candi_setid(n_obs-1, N_pairset, n_obs)
+        integer, intent(out) :: time(n_obs)
         ! 
         integer :: n
         ! 
         do n = 2, n_obs
+            call cpu_time(time(n-1))
             if (n == 2) then
                 call matching_pair(&
                     N_candi_setid(n - 1), candi_setid(n - 1, :, :n), &
@@ -37,6 +39,7 @@ contains
                     s_hat_set(:n, :), epsilon, N_pairset, thetaset, pairidset)
             end if
         end do
+        call cpu_time(time(n_obs))
     end subroutine matching_set_for_analysis
 
     subroutine matching_set(&

@@ -11,15 +11,17 @@ def matching_set_for_analysis(n_obs, s_hat_list, epsilon, db):
     thetaset = db.get_Theta_pair_FOV()
     pairidset = db.get_I_pair_FOV()
     #
-    N_candi_setid, candi_setid = subgraph_f.matching_set_for_analysis(
+    N_candi_setid, candi_setid, time = subgraph_f.matching_set_for_analysis(
         N_candi_setid, candi_setid,
         n_obs, s_hat_set, epsilon,
         N_set, RA_set, DE_set, N_pairset, thetaset, pairidset)
     #
     candi_setid_each_list = []
-    for n in range(n_obs-1):
-        candi_setid_each_list.append(candi_setid[n, :N_candi_setid[n], :n+2])
-    return candi_setid_each_list
+    time_list = []
+    for i in range(n_obs-1):
+        candi_setid_each_list.append(candi_setid[i, :N_candi_setid[i], :i+2])
+        time_list.append(time[i])
+    return candi_setid_each_list, time_list
 
 
 def matching_set(n_obs, s_hat_list, epsilon, db):

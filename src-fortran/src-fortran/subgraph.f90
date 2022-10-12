@@ -3,6 +3,45 @@ module subgraph_isomorphism_starid_detector
 
 contains
 
+    subroutine matching_set_for_analysis(&
+            N_candi_setid, candi_setid, time, &
+            n_obs, s_hat_set, epsilon, &
+            N_set, RA_set, DE_set, N_pairset, thetaset, pairidset)
+        implicit none;
+        integer, intent(in) :: n_obs
+        double precision, intent(in) :: s_hat_set(n_obs, 3)
+        double precision, intent(in) :: epsilon
+        integer, intent(in) :: N_set, N_pairset
+        double precision, intent(in) :: RA_set(N_set), DE_set(N_set)
+        double precision, intent(in) :: thetaset(N_pairset)
+        integer, intent(in) :: pairidset(N_pairset, 2)
+        integer, intent(out) :: N_candi_setid(n_obs-1)
+        integer, intent(out) :: candi_setid(n_obs-1, N_pairset, n_obs)
+        integer, intent(out) :: time(n_obs)
+        ! 
+        integer :: n
+        ! 
+        do n = 2, n_obs
+            call cpu_time(time(n-1))
+            if (n == 2) then
+                call matching_pair(&
+                    N_candi_setid(n - 1), candi_setid(n - 1, :, :n), &
+                    s_hat_set, epsilon, N_pairset, thetaset, pairidset)
+            else if (n == 3) then
+                call matching_triangle(&
+                    N_candi_setid(n - 1), candi_setid(n - 1, :, :n), &
+                    s_hat_set(:n, :), epsilon, &
+                    N_set, RA_set, DE_set, N_pairset, thetaset, pairidset)
+            else
+                call matching_multiangle(&
+                    N_candi_setid(n - 1), candi_setid(n - 1, :, :n), &
+                    n, N_candi_setid(n - 2), candi_setid(n - 2, :, :n - 1), &
+                    s_hat_set(:n, :), epsilon, N_pairset, thetaset, pairidset)
+            end if
+        end do
+        call cpu_time(time(n_obs))
+    end subroutine matching_set_for_analysis
+
     subroutine matching_set(&
             N_candi_setid, candi_setid, &
             n_obs, s_hat_set, epsilon, &
