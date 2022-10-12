@@ -17,7 +17,7 @@ contains
         integer, intent(in) :: pairidset(N_pairset, 2)
         integer, intent(out) :: N_candi_setid(n_obs-1)
         integer, intent(out) :: candi_setid(n_obs-1, N_pairset, n_obs)
-        integer, intent(out) :: time(n_obs)
+        double precision, intent(out) :: time(n_obs)
         ! 
         integer :: n
         ! 
@@ -26,7 +26,7 @@ contains
             if (n == 2) then
                 call matching_pair(&
                     N_candi_setid(n - 1), candi_setid(n - 1, :, :n), &
-                    s_hat_set, epsilon, N_pairset, thetaset, pairidset)
+                    s_hat_set(:n, :), epsilon, N_pairset, thetaset, pairidset)
             else if (n == 3) then
                 call matching_triangle(&
                     N_candi_setid(n - 1), candi_setid(n - 1, :, :n), &
