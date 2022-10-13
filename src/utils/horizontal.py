@@ -1,8 +1,6 @@
 import numpy as np
-from numba import jit
 
 
-# @jit
 def horizontal2vec(A, h):
     x = np.sin(h)
     y = np.sin(A)*np.cos(h)

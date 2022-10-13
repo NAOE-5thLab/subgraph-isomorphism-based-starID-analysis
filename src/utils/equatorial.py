@@ -1,8 +1,6 @@
 import numpy as np
-from numba import jit
 
 
-# @jit
 def vec2equatorial(vec):
     if vec.shape == (3,):
         x = vec[0]
@@ -27,7 +25,6 @@ def vec2equatorial(vec):
     return alpha, delta
 
 
-# @jit
 def equatorial2vec(alpha, delta):
     x = np.cos(alpha) * np.cos(delta)
     y = np.sin(alpha) * np.cos(delta)

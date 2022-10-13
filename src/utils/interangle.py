@@ -1,8 +1,6 @@
 import numpy as np
-from numba import jit
 
 
-# @jit
 def inter_star_angle_RADE(alpha1, delta1, alpha2, delta2):
     """inter star angle
 
@@ -25,7 +23,6 @@ def inter_star_angle_RADE(alpha1, delta1, alpha2, delta2):
     return inter_angle
 
 
-# @jit
 def inter_star_angle_vec(star1_vec, star2_vec):
     inner = np.inner(star1_vec, star2_vec)
     star1_len = np.linalg.norm(star1_vec, axis=star1_vec.ndim-1)

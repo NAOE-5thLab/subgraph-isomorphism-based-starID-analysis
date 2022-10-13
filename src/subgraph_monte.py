@@ -13,7 +13,7 @@ from utils.equatorial import equatorial2vec
 from utils.interangle import inter_star_angle_vec
 
 
-sampling_type = 0
+sampling_type = 1
 
 
 class Param:
@@ -33,7 +33,7 @@ class Param:
     log_dir = './log/subgraph_monte/'
     seed = 10
     # simulation
-    sample_N = 10
+    sample_N = 100
     alpha = 0.99
     alpha_sampling = 0.9999
 
@@ -74,7 +74,7 @@ def add_observation_noise(s_list, kappa, theta_sampling, kappa_sampling, seed=10
 
 def calc_weight(theta, kappa, theta_sampling, kappa_sampling):
     if sampling_type == 0:
-        return 1
+        return np.ones_like(theta)
     elif sampling_type == 1:
         numerator = kappa * \
             np.exp(kappa*(np.cos(theta)-1)) * (1 - np.cos(theta_sampling))
@@ -134,13 +134,14 @@ def main(args):
         # add noise on star position
         s_hat_list, theta_error_list = add_observation_noise(
             s_list, p.kappa, p.theta_sampling, p.kappa_sampling, seed=seeds_one[2])
-        ### SEARCH GRAPH ###
-        candi_setid_each_list, time_list = matching_set_for_analysis(
-            n_obs_able, s_hat_list, p.k*p.theta_img, pairstar_db)
-        ### CALC STATS and LOGGING ###
-        # weight
-        weights = calc_weight(
-            np.array(theta_error_list), p.kappa, p.theta_sampling, p.kappa_sampling)
+        if n_obs_able >= 2:
+            ### SEARCH GRAPH ###
+            candi_setid_each_list, time_list = matching_set_for_analysis(
+                n_obs_able, s_hat_list, p.k*p.theta_img, pairstar_db)
+            ### CALC STATS and LOGGING ###
+            # weight
+            weights = calc_weight(
+                np.array(theta_error_list), p.kappa, p.theta_sampling, p.kappa_sampling)
         #
         for i in range(p.n_obs_max-1):
             if i+2 <= n_obs_able:
@@ -148,16 +149,22 @@ def main(args):
                 matching_num, multiple, unique, noexist, included = calc_stats(
                     candi_setid_each_list[i], obs_setid)
                 weight = np.prod(weights[:i+2])
-                time = time_list[i-1] - time_list[0]
+                if i == 0:
+                    time = time_list[i+1] - time_list[0]
+                else:
+                    time = time_list[i+1] - time_list[1]
                 # log
                 logger_list[i].append(
                     [1, time, matching_num, multiple, unique, noexist, included, weight])
             else:
                 logger_list[i].append([0, -1, -1, -1, -1, -1, -1, -1])
+        #
+        if time_list[-1] - time_list[0] > 60.0:
+            break
     # save
     for i in range(p.n_obs_max-1):
         logger_list[i].save(
-            f'stats_{p.seed}_{i+2}_{p.Vmax}_{p.theta_FOV*180/np.pi}_{p.theta_img*180/np.pi}_{p.k}_{sampling_type}')
+            f'stats_{p.sample_N}_{p.seed}_{i+2}_{p.Vmax}_{p.theta_FOV*180/np.pi}_{p.theta_img*180/np.pi}_{p.k}_{sampling_type}')
 
 
 def calc_stats(candi_setids, obs_setid):
@@ -190,12 +197,12 @@ if __name__ == '__main__':
     parser.add_argument(
         "--theta_img",
         type=int,
-        default=2,
+        default=4,
         help="ganbare")
     parser.add_argument(
         "--k",
         type=int,
-        default=2,
+        default=3,
         help="ganbare")
     args = parser.parse_args()
     #
