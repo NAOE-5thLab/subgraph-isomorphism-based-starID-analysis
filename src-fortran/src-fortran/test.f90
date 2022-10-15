@@ -1,6 +1,6 @@
 
 program src_fortran
-    use subgraph_isomorphism_starid_detector, only: matching_set, matching_set_for_analysis
+    use subgraph_isomorphism_starid_detector, only: matching_set_for_analysis
     !
     implicit none
     integer :: FILEID_I = 1
@@ -11,12 +11,13 @@ program src_fortran
     integer :: FILEID_Ipair = 6
     integer :: FILEID_Theta = 7
     !
-    integer :: n_obs = 10
-    integer :: obs_setID(10) = (/918, 641, 638, 1024, 731, 960, 752, 1098, 775, 941/)
-    double precision :: s_hat_set(10, 3)
-    double precision :: epsilon = 1.0d-2 * 3.14d0/180d0
+    integer :: n_obs = 4
+    !integer :: obs_setID(10) = (/918, 641, 638, 1024, 731, 960, 752, 1098, 775, 941/)
+    integer :: obs_setID(4) = (/842, 939, 922, 886/)
+    double precision :: s_hat_set(4, 3)
+    double precision :: epsilon = 1.0d0 * 3.14d0/180d0
     !
-    integer :: N_starset, N_pairset
+    integer :: N_starset, N_pairset, N_candi
     integer, allocatable :: I_star(:), HR(:)
     double precision, allocatable :: RA(:), DE(:), Vmag(:)
     integer, allocatable :: pairidset(:, :)
@@ -117,9 +118,10 @@ program src_fortran
     allocate(N_candi_setid(n_obs-1))
     allocate(candi_setid(n_obs-1, N_pairset, n_obs))
     allocate(time(n_obs))
+    N_candi = N_pairset
     call matching_set_for_analysis(&
             N_candi_setid, candi_setid, time, &
-            n_obs, s_hat_set(:n_obs, :), epsilon, &
+            N_candi, n_obs, s_hat_set(:n_obs, :), epsilon, &
             N_starset, RA, DE, N_pairset, thetaset, pairidset)
     
     do i = 1, n_obs-1

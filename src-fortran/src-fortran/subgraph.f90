@@ -5,18 +5,18 @@ contains
 
     subroutine matching_set_for_analysis(&
             N_candi_setid, candi_setid, time, &
-            n_obs, s_hat_set, epsilon, &
+            N_candi, n_obs, s_hat_set, epsilon, &
             N_set, RA_set, DE_set, N_pairset, thetaset, pairidset)
         implicit none;
         integer, intent(in) :: n_obs
         double precision, intent(in) :: s_hat_set(n_obs, 3)
         double precision, intent(in) :: epsilon
-        integer, intent(in) :: N_set, N_pairset
+        integer, intent(in) :: N_set, N_pairset, N_candi
         double precision, intent(in) :: RA_set(N_set), DE_set(N_set)
         double precision, intent(in) :: thetaset(N_pairset)
         integer, intent(in) :: pairidset(N_pairset, 2)
         integer, intent(out) :: N_candi_setid(n_obs-1)
-        integer, intent(out) :: candi_setid(n_obs-1, N_pairset, n_obs)
+        integer, intent(out) :: candi_setid(n_obs-1, N_candi, n_obs)
         double precision, intent(out) :: time(n_obs)
         ! 
         integer :: n
@@ -26,88 +26,33 @@ contains
             if (n == 2) then
                 call matching_pair(&
                     N_candi_setid(n - 1), candi_setid(n - 1, :, :n), &
-                    s_hat_set(:n, :), epsilon, N_pairset, thetaset, pairidset)
+                    N_candi, s_hat_set(:n, :), epsilon, N_pairset, thetaset, pairidset)
             else if (n == 3) then
                 call matching_triangle(&
                     N_candi_setid(n - 1), candi_setid(n - 1, :, :n), &
-                    s_hat_set(:n, :), epsilon, &
+                    N_candi, s_hat_set(:n, :), epsilon, &
                     N_set, RA_set, DE_set, N_pairset, thetaset, pairidset)
             else
                 call matching_multiangle(&
                     N_candi_setid(n - 1), candi_setid(n - 1, :, :n), &
-                    n, N_candi_setid(n - 2), candi_setid(n - 2, :, :n - 1), &
+                    N_candi, n, N_candi_setid(n - 2), candi_setid(n - 2, :, :n - 1), &
                     s_hat_set(:n, :), epsilon, N_pairset, thetaset, pairidset)
             end if
         end do
         call cpu_time(time(n_obs))
     end subroutine matching_set_for_analysis
 
-    subroutine matching_set(&
-            N_candi_setid, candi_setid, &
-            n_obs, s_hat_set, epsilon, &
-            N_set, RA_set, DE_set, N_pairset, thetaset, pairidset)
-        implicit none;
-        integer, intent(in) :: n_obs
-        double precision, intent(in) :: s_hat_set(n_obs, 3)
-        double precision, intent(in) :: epsilon
-        integer, intent(in) :: N_set, N_pairset
-        double precision, intent(in) :: RA_set(N_set), DE_set(N_set)
-        double precision, intent(in) :: thetaset(N_pairset)
-        integer, intent(in) :: pairidset(N_pairset, 2)
-        integer, intent(out) :: N_candi_setid
-        integer, intent(out) :: candi_setid(N_pairset, n_obs)
-        !
-        integer :: pre_N_candi_setid
-        integer, allocatable :: pre_candi_setid(:, :)
-        integer :: N_candi_setid_temp
-        integer, allocatable :: candi_setid_temp(:, :)
-        ! 
-        integer :: n
-        !
-        if (n_obs == 2) then
-            call matching_pair(&
-                N_candi_setid, candi_setid, &
-                s_hat_set, epsilon, N_pairset, thetaset, pairidset)
-        else if (n_obs > 2) then
-            do n = 3, n_obs
-                if (n == 3) then
-                    allocate(candi_setid_temp(N_pairset, n))
-                    call matching_triangle(&
-                        N_candi_setid_temp, candi_setid_temp, &
-                        s_hat_set(:n, :), epsilon, &
-                        N_set, RA_set, DE_set, N_pairset, thetaset, pairidset)
-                else
-                    deallocate(candi_setid_temp)
-                    allocate(candi_setid_temp(N_pairset, n))
-                    call matching_multiangle(&
-                        N_candi_setid_temp, candi_setid_temp, &
-                        n, pre_N_candi_setid, pre_candi_setid, &
-                        s_hat_set(:n, :), epsilon, N_pairset, thetaset, pairidset)
-                    deallocate(pre_candi_setid)
-                end if
-                allocate(pre_candi_setid(N_pairset, n))
-                pre_N_candi_setid = N_candi_setid_temp
-                pre_candi_setid = candi_setid_temp
-            end do
-            N_candi_setid = N_candi_setid_temp
-            candi_setid = candi_setid_temp
-        else
-            print*, 'error : n_obs'
-        end if
-
-    end subroutine matching_set
-
     subroutine matching_pair(&
             N_candi_pairid_ij, candi_pairid_ij, &
-            s_hat_set, epsilon, N_pairset, thetaset, pairidset)
+            N_candi, s_hat_set, epsilon, N_pairset, thetaset, pairidset)
         implicit none;
         double precision, intent(in) :: s_hat_set(2, 3)
         double precision, intent(in) :: epsilon
-        integer, intent(in) :: N_pairset
+        integer, intent(in) :: N_pairset, N_candi
         double precision, intent(in) :: thetaset(N_pairset)
         integer, intent(in) :: pairidset(N_pairset, 2)
         integer, intent(out) :: N_candi_pairid_ij
-        integer, intent(out) :: candi_pairid_ij(N_pairset, 2)
+        integer, intent(out) :: candi_pairid_ij(N_candi, 2)
         !
         double precision :: s_hat_i(3), s_hat_j(3), theta_hat_ij
         !
@@ -115,37 +60,37 @@ contains
         s_hat_j = s_hat_set(2, :)
         call inter_angle_3dvec(theta_hat_ij, s_hat_i, s_hat_j)
         call get_pairids_of_candi_theta(&
-            N_candi_pairid_ij, candi_pairid_ij, &
+            N_candi_pairid_ij, candi_pairid_ij, N_candi, &
             theta_hat_ij, epsilon, &
             N_pairset, thetaset, pairidset)
     end subroutine matching_pair
 
     subroutine matching_triangle(&
             N_candi_triangleid_ijk, candi_triangleid_ijk, &
-            s_hat_set, epsilon, &
+            N_candi, s_hat_set, epsilon, &
             N_set, RA_set, DE_set, N_pairset, thetaset, pairidset)
         implicit none;
         double precision, intent(in) :: s_hat_set(3, 3)
         double precision, intent(in) :: epsilon
-        integer, intent(in) :: N_set, N_pairset
+        integer, intent(in) :: N_set, N_pairset, N_candi
         double precision, intent(in) :: RA_set(N_set), DE_set(N_set)
         double precision, intent(in) :: thetaset(N_pairset)
         integer, intent(in) :: pairidset(N_pairset, 2)
         integer, intent(out) :: N_candi_triangleid_ijk
-        integer, intent(out) :: candi_triangleid_ijk(N_pairset, 3)
+        integer, intent(out) :: candi_triangleid_ijk(N_candi, 3)
         !
         double precision :: s_hat_i(3), s_hat_j(3), s_hat_k(3)
         double precision :: theta_hat_ij, theta_hat_ik, theta_hat_jk
-        integer :: N_candi_triangleid_ijk_temp, candi_triangleid_ijk_temp(N_pairset, 3)
-        integer :: N_candi_pairid_ij, candi_pairid_ij(N_pairset, 2)
-        integer :: N_candi_pairid_ik, candi_pairid_ik(N_pairset, 2)
-        integer :: N_candi_pairid_jk, candi_pairid_jk(N_pairset, 2)
-        integer :: candi_pairid_ij_1d(N_pairset), candi_pairid_ik_1d(N_pairset)
-        integer :: N_candi_pairid_ij_1d_uni, candi_pairid_ij_1d_uni(N_pairset)
-        integer :: N_candi_pairid_ik_1d_uni, candi_pairid_ik_1d_uni(N_pairset)
-        integer :: N_candi_starid_i, candi_starid_i(N_pairset)
-        integer :: N_candi_starid_j, candi_starid_j(N_pairset)
-        integer :: N_candi_starid_k, candi_starid_k(N_pairset)
+        integer :: N_candi_triangleid_ijk_temp, candi_triangleid_ijk_temp(N_candi, 3)
+        integer :: N_candi_pairid_ij, candi_pairid_ij(N_candi, 2)
+        integer :: N_candi_pairid_ik, candi_pairid_ik(N_candi, 2)
+        integer :: N_candi_pairid_jk, candi_pairid_jk(N_candi, 2)
+        integer, allocatable :: candi_pairid_ij_1d(:), candi_pairid_ik_1d(:)
+        integer, allocatable :: candi_pairid_ij_1d_uni(:), candi_pairid_ik_1d_uni(:)
+        integer :: N_candi_pairid_ij_1d_uni, N_candi_pairid_ik_1d_uni
+        integer :: N_candi_starid_i, candi_starid_i(N_candi)
+        integer :: N_candi_starid_j, candi_starid_j(N_candi)
+        integer :: N_candi_starid_k, candi_starid_k(N_candi)
         double precision :: obs_sign, candi_sign
         double precision :: vec_i(3), vec_j(3), vec_k(3)
         integer :: i, i1, i2, i3, i4, i5, i6, i7, i8
@@ -158,26 +103,28 @@ contains
         call inter_angle_3dvec(theta_hat_ik, s_hat_i, s_hat_k)
         call inter_angle_3dvec(theta_hat_jk, s_hat_j, s_hat_k)
         call get_pairids_of_candi_theta(&
-            N_candi_pairid_ij, candi_pairid_ij, &
+            N_candi_pairid_ij, candi_pairid_ij, N_candi, &
             theta_hat_ij, epsilon, N_pairset, thetaset, pairidset)
         call get_pairids_of_candi_theta(&
-            N_candi_pairid_ik, candi_pairid_ik, &
+            N_candi_pairid_ik, candi_pairid_ik, N_candi, &
             theta_hat_ik, epsilon, N_pairset, thetaset, pairidset)
         call get_pairids_of_candi_theta(&
-            N_candi_pairid_jk, candi_pairid_jk, &
+            N_candi_pairid_jk, candi_pairid_jk, N_candi, &
             theta_hat_jk, epsilon, N_pairset, thetaset, pairidset)
         ! select i
         count = 0
         ! convert 1d ij
+        allocate(candi_pairid_ij_1d(2*N_candi_pairid_ij), candi_pairid_ij_1d_uni(2*N_candi_pairid_ij))
         candi_pairid_ij_1d(:N_candi_pairid_ij) = candi_pairid_ij(:N_candi_pairid_ij, 1)
         candi_pairid_ij_1d(N_candi_pairid_ij+1:2*N_candi_pairid_ij) = candi_pairid_ij(:N_candi_pairid_ij, 2)
         call unique_intarray1d(N_candi_pairid_ij_1d_uni, candi_pairid_ij_1d_uni, &
-                2*N_candi_pairid_ij, candi_pairid_ij_1d(:2*N_candi_pairid_ij))
+                2*N_candi_pairid_ij, candi_pairid_ij_1d)
         ! convert 1d ik
+        allocate(candi_pairid_ik_1d(2*N_candi_pairid_ik), candi_pairid_ik_1d_uni(2*N_candi_pairid_ik))
         candi_pairid_ik_1d(:N_candi_pairid_ik) = candi_pairid_ik(:N_candi_pairid_ik, 1)
         candi_pairid_ik_1d(N_candi_pairid_ik+1:2*N_candi_pairid_ik) = candi_pairid_ik(:N_candi_pairid_ik, 2)
         call unique_intarray1d(N_candi_pairid_ik_1d_uni, candi_pairid_ik_1d_uni, &
-                2*N_candi_pairid_ik, candi_pairid_ik_1d(:2*N_candi_pairid_ij))
+                2*N_candi_pairid_ik, candi_pairid_ik_1d)
         !
         do i1 = 1, N_candi_pairid_ij_1d_uni
             if (any(candi_pairid_ij_1d_uni(i1) == candi_pairid_ik_1d_uni(1:N_candi_pairid_ik_1d_uni))) then
@@ -215,7 +162,7 @@ contains
             N_candi_starid_k = count
             ! select j&k-th pair stars candidate
             do i5 = 1, N_candi_starid_j
-                do i6 = 1, N_candi_starid_k    
+                do i6 = 1, N_candi_starid_k
                     if (candi_starid_j(i5) < candi_starid_k(i6)) then
                         do i7 = 1, N_candi_pairid_jk
                             if (candi_pairid_jk(i7, 1) == candi_starid_j(i5) &
@@ -226,7 +173,7 @@ contains
                                 candi_triangleid_ijk_temp(count_tiangleid, 3) = candi_starid_k(i6)
                                 exit;
                             end if
-                        end do        
+                        end do
                     else
                         do i7 = 1, N_candi_pairid_jk
                             if (candi_pairid_jk(i7, 1) == candi_starid_k(i6) &
@@ -237,8 +184,8 @@ contains
                                 candi_triangleid_ijk_temp(count_tiangleid, 3) = candi_starid_k(i6)
                                 exit;
                             end if
-                        end do  
-                    end if                    
+                        end do
+                    end if
                 end do
             end do
         end do
@@ -268,26 +215,26 @@ contains
 
     subroutine matching_multiangle(&
             N_candi_setid, candi_setid, &
-            n_obs, pre_N_candi_setid, pre_candi_setid, &
+            N_candi, n_obs, pre_N_candi_setid, pre_candi_setid, &
             s_hat_set, epsilon, N_pairset, thetaset, pairidset)
         implicit none;
         integer, intent(in) :: n_obs
         integer, intent(in) :: pre_N_candi_setid
-        integer, intent(in) :: pre_candi_setid(N_pairset, n_obs-1)
+        integer, intent(in) :: pre_candi_setid(N_candi, n_obs-1)
         double precision, intent(in) :: s_hat_set(n_obs, 3)
         double precision, intent(in) :: epsilon
-        integer, intent(in) :: N_pairset
+        integer, intent(in) :: N_pairset, N_candi
         double precision, intent(in) :: thetaset(N_pairset)
         integer, intent(in) :: pairidset(N_pairset, 2)
         integer, intent(out) :: N_candi_setid
-        integer, intent(out) :: candi_setid(N_pairset, n_obs)
+        integer, intent(out) :: candi_setid(N_candi, n_obs)
         !
-        integer :: N_candi_pairid_in(n_obs-1), candi_pairid_in(n_obs-1, N_pairset, 2)
+        integer :: N_candi_pairid_in(n_obs-1), candi_pairid_in(n_obs-1, N_candi, 2)
         double precision :: s_hat_i(3), s_hat_n(3), theta_hat_in
         integer :: candi_starid_i
-        integer :: N_candi_starid_n_from_i, candi_starid_n_from_i(N_pairset)
-        integer :: N_candi_starid_n_temp, candi_starid_n_temp(N_pairset)
-        integer :: N_candi_starid_n, candi_starid_n(N_pairset)
+        integer :: N_candi_starid_n_from_i, candi_starid_n_from_i(N_candi)
+        integer :: N_candi_starid_n_temp, candi_starid_n_temp(N_candi)
+        integer :: N_candi_starid_n, candi_starid_n(N_candi)
         !
         integer :: i1, i2, i3, i4, i5, i6
         integer :: count, count_setid
@@ -299,7 +246,7 @@ contains
             s_hat_n = s_hat_set(n_obs, :)
             call inter_angle_3dvec(theta_hat_in, s_hat_i, s_hat_n)
             call get_pairids_of_candi_theta(&
-                N_candi_pairid_in(i1), candi_pairid_in(i1, :, :), &
+                N_candi_pairid_in(i1), candi_pairid_in(i1, :, :), N_candi, &
                 theta_hat_in, epsilon, N_pairset, thetaset, pairidset)
         end do
         ! determine candidate of last star in each set of matched stars except last
@@ -346,15 +293,16 @@ contains
 
     subroutine get_pairids_of_candi_theta(&
             N_candiset, candi_pairidset, &
-            theta_hat, epsilon, N_pairset, thetaset, pairidset)
+            N_candi, theta_hat, epsilon, N_pairset, thetaset, pairidset)
         implicit none;
         double precision, intent(in) :: theta_hat
         double precision, intent(in) :: epsilon
         integer, intent(in) :: N_pairset
+        integer, intent(in) :: N_candi
         double precision, intent(in) :: thetaset(N_pairset)
         integer, intent(in) :: pairidset(N_pairset, 2)
         integer, intent(out) :: N_candiset
-        integer, intent(out) :: candi_pairidset(N_pairset, 2)
+        integer, intent(out) :: candi_pairidset(N_candi, 2)
         !
         integer :: ii
         integer :: count
@@ -396,10 +344,11 @@ contains
         ! vec1 \cdot cross
         inner = vec1(1)*cross(1) + vec1(2)*cross(2) + vec1(3)*cross(3)
         ! sign(inner)
-        sign_value = sign(1.0, inner)
+        sign_value = sign(1.0d0, inner)
     end subroutine triangle_specular_sign
 
     subroutine equatorial2vec(vec, alpha, delta)
+        implicit none;
         double precision, intent(in) :: alpha, delta
         double precision, intent(out) :: vec(3)
         !
@@ -409,6 +358,7 @@ contains
     end subroutine equatorial2vec
 
     subroutine unique_intarray1d(N_array1d_uni, array1d_uni, N_array1d, array1d)
+        implicit none;
         integer, intent(in) :: N_array1d
         integer, intent(in) :: array1d(N_array1d)
         integer, intent(out) :: N_array1d_uni
@@ -439,7 +389,7 @@ contains
             integer, intent(in) :: N, left, right
             integer, intent(inout) :: array(N)
             integer, intent(out) :: pivot
-            ! 
+            !
             integer :: i, temp, last
             !
             last = left
@@ -472,138 +422,59 @@ contains
 
     end subroutine unique_intarray1d
 
+    !
+    !subroutine matching_set(&
+    !        N_candi_setid, candi_setid, &
+    !        n_obs, s_hat_set, epsilon, &
+    !        N_set, RA_set, DE_set, N_pairset, thetaset, pairidset)
+    !    implicit none;
+    !    integer, intent(in) :: n_obs
+    !    double precision, intent(in) :: s_hat_set(n_obs, 3)
+    !    double precision, intent(in) :: epsilon
+    !    integer, intent(in) :: N_set, N_pairset
+    !    double precision, intent(in) :: RA_set(N_set), DE_set(N_set)
+    !    double precision, intent(in) :: thetaset(N_pairset)
+    !    integer, intent(in) :: pairidset(N_pairset, 2)
+    !    integer, intent(out) :: N_candi_setid
+    !    integer, intent(out) :: candi_setid(N_pairset, n_obs)
+    !    !
+    !    integer :: pre_N_candi_setid
+    !    integer, allocatable :: pre_candi_setid(:, :)
+    !    integer :: N_candi_setid_temp
+    !    integer, allocatable :: candi_setid_temp(:, :)
+    !    ! 
+    !    integer :: n
+    !    !
+    !    if (n_obs == 2) then
+    !        call matching_pair(&
+    !            N_candi_setid, candi_setid, &
+    !            s_hat_set, epsilon, N_pairset, thetaset, pairidset)
+    !    else if (n_obs > 2) then
+    !        do n = 3, n_obs
+    !            if (n == 3) then
+    !                allocate(candi_setid_temp(N_pairset, n))
+    !                call matching_triangle(&
+    !                    N_candi_setid_temp, candi_setid_temp, &
+    !                    s_hat_set(:n, :), epsilon, &
+    !                    N_set, RA_set, DE_set, N_pairset, thetaset, pairidset)
+    !            else
+    !                deallocate(candi_setid_temp)
+    !                allocate(candi_setid_temp(N_pairset, n))
+    !                call matching_multiangle(&
+    !                    N_candi_setid_temp, candi_setid_temp, &
+    !                    n, pre_N_candi_setid, pre_candi_setid, &
+    !                    s_hat_set(:n, :), epsilon, N_pairset, thetaset, pairidset)
+    !                deallocate(pre_candi_setid)
+    !            end if
+    !            allocate(pre_candi_setid(N_pairset, n))
+    !            pre_N_candi_setid = N_candi_setid_temp
+    !            pre_candi_setid = candi_setid_temp
+    !        end do
+    !        N_candi_setid = N_candi_setid_temp
+    !        candi_setid = candi_setid_temp
+    !    else
+    !        print*, 'error : n_obs'
+    !    end if
+    !
+    !end subroutine matching_set
 end module subgraph_isomorphism_starid_detector
-
-
-
-        ! do n = 2, n_obs
-        !     if (n == 2) then
-        !         allocate(candi_setid_temp(N_pairset, n))
-        !         call matching_pair(&
-        !             N_candi_setid_temp, candi_setid_temp, &
-        !             s_hat_set(1:2, :), epsilon, N_pairset, thetaset, pairidset)
-        !     else
-        !         deallocate(candi_setid_temp)
-        !         allocate(candi_setid_temp(N_pairset, n))
-        !         count_setid = 0
-        !         ! matching pair stars including last star
-        !         allocate(N_candi_pairid_in(n-1))
-        !         allocate(candi_pairid_in(n-1, N_pairset, 2))
-        !         do i1 = 1, n-1
-        !             s_hat_i = s_hat_set(i1, :)
-        !             s_hat_n = s_hat_set(n, :)
-        !             call inter_angle_3dvec(theta_hat_in, s_hat_i, s_hat_n)
-        !             call get_pairids_of_candi_theta(&
-        !                 N_candi_pairid_in(i1), candi_pairid_in(i1, :, :), &
-        !                 theta_hat_in, epsilon, N_pairset, thetaset, pairidset)
-        !         end do
-        !         ! determine candidate of last star in each set of matched stars except last
-        !         do i2 = 1, pre_N_candi_setid
-        !             do i3 = 1, n-1
-        !                 candi_starid_i = pre_candi_setid(i2, i3)
-        !                 count = 0
-        !                 do i4 = 1, N_candi_pairid_in(i3)
-        !                     if (candi_pairid_in(i3, i4, 1) == candi_starid_i) then
-        !                         count = count + 1
-        !                         candi_starid_n_from_i(count) = candi_pairid_in(i3, i4, 2)
-        !                     else if (candi_pairid_in(i3, i4, 2) == candi_starid_i) then
-        !                          count = count + 1
-        !                         candi_starid_n_from_i(count) = candi_pairid_in(i3, i4, 1)
-        !                     end if
-        !                 end do
-        !                 N_candi_starid_n_from_i = count
-        !                 !
-        !                 if (i3 == 1) then
-        !                     N_candi_starid_n = N_candi_starid_n_from_i
-        !                     candi_starid_n = candi_starid_n_from_i
-        !                 else
-        !                     count = 0
-        !                     do i5 = 1, N_candi_starid_n
-        !                         if (any(candi_starid_n(i5) == candi_starid_n_from_i(1:N_candi_starid_n_from_i))) then
-        !                             count = count + 1
-        !                             candi_starid_n_temp(count) = candi_starid_n(i5)
-        !                         end if
-        !                     end do
-        !                     N_candi_starid_n = count
-        !                     candi_starid_n = candi_starid_n_temp
-        !                 end if
-        !                 !
-        !                 if (N_candi_starid_n == 0) exit
-        !             end do
-        !             ! 
-        !             do i6 = 1, N_candi_starid_n
-        !                 count_setid = count_setid + 1
-        !                 candi_setid_temp(count_setid, :) = [pre_candi_setid(i6, :), candi_starid_n(i6)]
-        !             end do
-        !         end do
-        !         N_candi_setid_temp = count_setid
-        !         !
-        !         deallocate(N_candi_pairid_in)
-        !         deallocate(candi_pairid_in)
-        !         deallocate(pre_candi_setid)
-        !     end if
-        !     allocate(pre_candi_setid(N_pairset, n))
-        !     pre_N_candi_setid = N_candi_setid_temp
-        !     pre_candi_setid = candi_setid_temp
-        ! end do
-        ! N_candi_setid = N_candi_setid_temp
-        ! candi_setid = candi_setid_temp
-
-
-
-
-                    ! count_setid = 0
-                    ! ! matching pair stars including last star
-                    ! allocate(N_candi_pairid_in(n-1))
-                    ! allocate(candi_pairid_in(n-1, N_pairset, 2))
-                    ! do i1 = 1, n-1
-                    !     s_hat_i = s_hat_set(i1, :)
-                    !     s_hat_n = s_hat_set(n, :)
-                    !     call inter_angle_3dvec(theta_hat_in, s_hat_i, s_hat_n)
-                    !     call get_pairids_of_candi_theta(&
-                    !         N_candi_pairid_in(i1), candi_pairid_in(i1, :, :), &
-                    !         theta_hat_in, epsilon, N_pairset, thetaset, pairidset)
-                    ! end do
-                    ! ! determine candidate of last star in each set of matched stars except last
-                    ! do i2 = 1, pre_N_candi_setid
-                    !     do i3 = 1, n-1
-                    !         candi_starid_i = pre_candi_setid(i2, i3)
-                    !         count = 0
-                    !         do i4 = 1, N_candi_pairid_in(i3)
-                    !             if (candi_pairid_in(i3, i4, 1) == candi_starid_i) then
-                    !                 count = count + 1
-                    !                 candi_starid_n_from_i(count) = candi_pairid_in(i3, i4, 2)
-                    !             else if (candi_pairid_in(i3, i4, 2) == candi_starid_i) then
-                    !                 count = count + 1
-                    !                 candi_starid_n_from_i(count) = candi_pairid_in(i3, i4, 1)
-                    !             end if
-                    !         end do
-                    !         N_candi_starid_n_from_i = count
-                    !         !
-                    !         if (i3 == 1) then
-                    !             N_candi_starid_n = N_candi_starid_n_from_i
-                    !             candi_starid_n = candi_starid_n_from_i
-                    !         else
-                    !             count = 0
-                    !             do i5 = 1, N_candi_starid_n
-                    !                 if (any(candi_starid_n(i5) == candi_starid_n_from_i(1:N_candi_starid_n_from_i))) then
-                    !                     count = count + 1
-                    !                     candi_starid_n_temp(count) = candi_starid_n(i5)
-                    !                 end if
-                    !             end do
-                    !             N_candi_starid_n = count
-                    !             candi_starid_n = candi_starid_n_temp
-                    !         end if
-                    !         !
-                    !         if (N_candi_starid_n == 0) exit
-                    !     end do
-                    !     ! 
-                    !     do i6 = 1, N_candi_starid_n
-                    !         count_setid = count_setid + 1
-                    !         candi_setid_temp(count_setid, :) = [pre_candi_setid(i6, :), candi_starid_n(i6)]
-                    !     end do
-                    ! end do
-                    ! N_candi_setid_temp = count_setid
-                    !
-                    ! deallocate(N_candi_pairid_in)
-                    ! deallocate(candi_pairid_in)

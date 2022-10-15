@@ -6,7 +6,7 @@ import psutil
 
 
 def prepare_args():
-    theta_img = 11
+    theta_img = 10
     k = 5
     Vmax = 5
     theta_FOV = 4
