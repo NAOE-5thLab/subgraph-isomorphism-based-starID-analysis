@@ -155,10 +155,10 @@ def main(args):
                     time = time_list[i+1] - time_list[1]
                 # log
                 logger_list[i].append(
-                    [1, time, matching_num, multiple, unique, noexist, included, weight])
+                    [1, time, matching_num, int(multiple), int(unique), int(noexist), int(included), weight])
             else:
                 logger_list[i].append([0, -1, -1, -1, -1, -1, -1, -1])
-        # 
+        #
         if n_obs_able >= 2:
             if time_list[-1] - time_list[0] > 60.0:
                 print('time over')
