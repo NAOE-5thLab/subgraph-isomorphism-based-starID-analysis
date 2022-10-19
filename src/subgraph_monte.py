@@ -13,7 +13,7 @@ from utils.equatorial import equatorial2vec
 from utils.interangle import inter_star_angle_vec
 
 
-sampling_type = 1
+sampling_type = 0
 
 
 class Param:
@@ -23,17 +23,17 @@ class Param:
     theta_FOV_list = [i*np.pi/180 for i in [5, 10, 30, 60]]
     # simulation
     theta_img_list = [np.pi/180*10**i for i in [
-        -5.0, -4.5, -4.0, -3.5, -3.0, -2.5, -2.0, -1.5, -1.0, -0.5]]
+        -5.0, -4.5, -4.0, -3.5, -3.0, -2.5, -2.0, -1.5, -1.0]]
     # subgraph matching
     k_list = [2.0**i for i in [-1.0, -0.5, 0.0, 0.5, 1.0]]
-    n_obs_max = 10
+    n_obs_max = 6
 
     ### basic parameter ###
     # system
     log_dir = './log/subgraph_monte/'
     seed = 10
     # simulation
-    sample_N = 100
+    sample_N = 10000
     alpha = 0.99
     alpha_sampling = 0.9999
 
@@ -159,10 +159,10 @@ def main(args):
             else:
                 logger_list[i].append([0, -1, -1, -1, -1, -1, -1, -1])
         #
-        if n_obs_able >= 2:
-            if time_list[-1] - time_list[0] > 60.0:
-                print('time over')
-                break
+        # if n_obs_able >= 2:
+        #     if time_list[-1] - time_list[0] > 60.0:
+        #         print('time over')
+        #         break
     # save
     for i in range(p.n_obs_max-1):
         logger_list[i].save(
