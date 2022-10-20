@@ -23,9 +23,9 @@ class Param:
     theta_FOV_list = [i*np.pi/180 for i in [5, 10, 30, 60]]
     # simulation
     theta_img_list = [np.pi/180*10**i for i in [
-        -5.0, -4.5, -4.0, -3.5, -3.0, -2.5, -2.0, -1.5, -1.0]]
+        -5.0, -4.0, -3.0, -2.3333, -2.6666, -2.0, -1.25, -1.5, -1.75, -1.0]]
     # subgraph matching
-    k_list = [2.0**i for i in [-1.0, -0.5, 0.0, 0.5, 1.0]]
+    k_list = [2.0**i for i in [0.0, 0.5, 1.0]]
     n_obs_max = 6
 
     ### basic parameter ###
@@ -147,7 +147,7 @@ def main(args):
             if i+2 <= n_obs_able:
                 # stats
                 matching_num, multiple, unique, noexist, included = calc_stats(
-                    candi_setid_each_list[i], obs_setid)
+                    candi_setid_each_list[i], obs_setid[:i+2])
                 weight = np.prod(weights[:i+2])
                 if i == 0:
                     time = time_list[i+1] - time_list[0]

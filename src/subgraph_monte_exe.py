@@ -1,4 +1,4 @@
-from re import sub
+import numpy as np
 import time
 import subprocess
 
@@ -6,10 +6,21 @@ import psutil
 
 
 def prepare_args():
-    theta_img = 10
-    k = 5
-    Vmax = 5
-    theta_FOV = 4
+    ### Hyperparameter ###
+    # DB
+    Vmax_list = [i+0.5 for i in [1, 2, 3, 4, 5]]
+    theta_FOV_list = [i*np.pi/180 for i in [5, 10, 30, 60]]
+    # simulation
+    theta_img_list = [np.pi/180*10**i for i in [
+        -5.0, -4.0, -3.0, -2.3333, -2.6666, -2.0, -1.25, -1.5, -1.75, -1.0]]
+    # subgraph matching
+    k_list = [2.0**i for i in [0.0, 0.5, 1.0]]
+
+    ###  ###
+    theta_img = len(theta_img_list)
+    k = len(k_list)
+    Vmax = len(Vmax_list)
+    theta_FOV = len(theta_FOV_list)
     #
     args_list = []
     for a in range(theta_img):
@@ -18,6 +29,7 @@ def prepare_args():
                 for d in range(theta_FOV):
                     args_list.append([a, b, c, d])
     return args_list
+
 
 def main():
     args_list = prepare_args()
@@ -37,6 +49,7 @@ def main():
                 break
         time.sleep(1)
 
-if __name__=='__main__':
+
+if __name__ == '__main__':
     main()
     print('END')
