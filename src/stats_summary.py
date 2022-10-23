@@ -1,4 +1,6 @@
 import itertools
+import tqdm
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -13,8 +15,8 @@ n_obs_list = [2, 3, 4, 5, 6]
 Vmax_list = [i+0.5 for i in [1, 2, 3, 4, 5]]
 theta_FOV_list = [i*np.pi/180 for i in [5, 10, 30, 60]]
 theta_img_list = [np.pi/180*10**i for i in [
-    -5.0, -4.5, -4.0, -3.5, -3.0, -2.5, -2.0, -1.5, -1.0]]
-k_list = [2.0**i for i in [-1.0, -0.5, 0.0, 0.5, 1.0]]
+    -5.0, -4.0, -3.0, -2.3333, -2.6666, -2.0, -1.25, -1.5, -1.75, -1.0]]
+k_list = [2.0**i for i in [0.0, 0.5, 1.0]]
 # system
 log_dir = './log/subgraph_monte/'
 
@@ -26,7 +28,7 @@ def main():
                                 theta_FOV_list, theta_img_list, k_list))
     #
     data_set = {}
-    for i, [n_obs, Vmax, theta_FOV, theta_img, k] in enumerate(ps):
+    for i, [n_obs, Vmax, theta_FOV, theta_img, k] in enumerate(tqdm.tqdm(ps)):
         data = {}
         #
         data['n_obs'] = n_obs
@@ -47,31 +49,65 @@ def main():
         data['obs_num'] = obs_flag.sum()
         df_obs = df[obs_flag]
         if len(df_obs) < 1:
-            pass
-        #
-        data['time_mean'] = df_obs['time'].mean()
-        data['time_75'] = df_obs['time'].quantile(0.75)
-        data['time_50'] = df_obs['time'].quantile()
-        data['time_25'] = df_obs['time'].quantile(0.25)
-        data['time_min'] = df_obs['time'].min()
-        data['time_max'] = df_obs['time'].max()
-        #
-        data['matching_num_mean'] = df_obs['matching_num'].mean()
-        data['matching_num_75'] = df_obs['matching_num'].quantile(0.75)
-        data['matching_num_50'] = df_obs['matching_num'].quantile()
-        data['matching_num_25'] = df_obs['matching_num'].quantile(0.25)
-        data['matching_num_min'] = df_obs['matching_num'].min()
-        data['matching_num_max'] = df_obs['matching_num'].max()
-        #
-        data['multiple_num'] = df_obs['multiple'].sum()
-        data['unique_num'] = df_obs['unique'].sum()
-        data['noexist_num'] = df_obs['noexist'].sum()
-        #
-        data['included_num'] = df_obs['included'].sum()
-        #
-        data['collect'] = (df_obs['unique']*df_obs['included']).sum()
-        data['miss'] = (df_obs['unique']*(1 - df_obs['included'])).sum()
-        data['ambiguous'] = (1 - df_obs['unique']).sum()
+            data['time_mean'] = df_obs['time'].mean()
+            data['matching_num_mean'] = df_obs['matching_num'].mean()
+            #
+            data['obs_prob'] = data['obs_num'] / data['calc_num']
+            #
+            data['unique_num']     = None
+            data['unique_prob']    = None
+            data['ambiguous_num']  = None
+            data['ambiguous_prob'] = None
+            data['multiple_num']   = None
+            data['multiple_prob']  = None
+            data['noexist_num']    = None
+            data['noexist_prob']   = None
+            #
+            data['included_num']     = None
+            data['included_prob']    = None
+            data['notincluded_num']  = None
+            data['notincluded_prob'] = None
+            #
+            data['included_unique_num']         = None
+            data['included_unique_prob']        = None
+            data['notincluded_unique_num']      = None
+            data['notincluded_unique_prob']     = None
+            data['notincluded_noexist_num']     = None
+            data['notincluded_noexist_prob']    = None
+            #
+            data['included_on_unique_prob']     = None
+            data['notincluded_on_unique_prob']  = None
+            data['noexist_on_notincluded_prob'] = None
+        else:
+            data['time_mean'] = df_obs['time'].mean()
+            data['matching_num_mean'] = df_obs['matching_num'].mean()
+            #
+            data['obs_prob'] = data['obs_num'] / data['calc_num']
+            #
+            data['unique_num'] = df_obs['unique'].sum()
+            data['unique_prob'] = data['unique_num'] / data['obs_num']
+            data['ambiguous_num'] = (1 - df_obs['unique']).sum()
+            data['ambiguous_prob'] = data['ambiguous_num'] / data['obs_num']
+            data['multiple_num'] = df_obs['multiple'].sum()
+            data['multiple_prob'] = data['multiple_num'] / data['obs_num']
+            data['noexist_num'] = df_obs['noexist'].sum()
+            data['noexist_prob'] = data['noexist_num'] / data['obs_num']
+            #
+            data['included_num'] = df_obs['included'].sum()
+            data['included_prob'] = data['included_num'] / data['obs_num']
+            data['notincluded_num'] = (1-df_obs['included']).sum()
+            data['notincluded_prob'] = data['notincluded_num'] / data['obs_num']
+            #
+            data['included_unique_num'] = (df_obs['unique']*df_obs['included']).sum()
+            data['included_unique_prob'] = data['included_unique_num'] / data['obs_num']
+            data['notincluded_unique_num'] = (df_obs['unique']*(1 - df_obs['included'])).sum()
+            data['notincluded_unique_prob'] = data['notincluded_unique_num'] / data['obs_num']
+            data['notincluded_noexist_num'] = (df_obs['noexist']*(1 - df_obs['included'])).sum()
+            data['notincluded_noexist_prob'] = data['notincluded_noexist_num'] / data['obs_num']
+            #
+            data['included_on_unique_prob'] = data['included_unique_prob'] / data['unique_prob']
+            data['notincluded_on_unique_prob'] = data['notincluded_unique_prob'] / data['unique_prob']
+            data['noexist_on_notincluded_prob'] = data['notincluded_noexist_prob'] / data['notincluded_prob']
         #
         data_set[i] = data
     #
