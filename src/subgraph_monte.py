@@ -33,7 +33,7 @@ class Param:
     log_dir = './log/subgraph_monte/'
     seed = 10
     # simulation
-    sample_N = 10000
+    sample_N = 50000
     alpha = 0.99
     alpha_sampling = 0.9999
 
@@ -179,11 +179,12 @@ def calc_stats(candi_setids, obs_setid):
     noexist = matching_num == 0
     # correct pair is included in candidate pairs
     included = obs_set in candi_set_list
-    # 
-    candi_intersect_set = candi_set_list[0] & candi_set_list[1]
-    for candi_set in candi_set_list[2:]:
-        candi_intersect_set = candi_intersect_set & candi_set
-    # 
+    #
+    if len(candi_set_list) == 0:
+        candi_intersect_set = set()
+    else:
+        candi_intersect_set = set.intersection(*candi_set_list)
+    #
     if candi_intersect_set == set():
         determined = False
         correct = False
