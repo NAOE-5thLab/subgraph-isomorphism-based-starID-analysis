@@ -23,10 +23,10 @@ class Param:
     theta_FOV_list = [i*np.pi/180 for i in [5, 10, 30, 60]]
     # simulation
     theta_img_list = [np.pi/180*10**i for i in [
-        -5.0, -4.0, -3.0, -2.75, -2.5, -2.25, -2.0, -1.75, -1.5, -1.25, -1.0]]
+        -5.0, -4.5, -4.0, -3.5, -3.0, -2.5, -2.0, -1.5, -1.0]]
     # subgraph matching
-    k_list = [2.0**i for i in [0.0, 0.5, 1.0]]
-    n_obs_max = 6
+    k_list = [2.0**i for i in [-0.5, 0.0, 0.5, 1.0]]
+    n_obs_max = 8
 
     ### basic parameter ###
     # system
@@ -106,7 +106,7 @@ def main(args):
 
     ### Prepair LOGGER ###
     header = [
-        'observable', 'time', 'matching_num', 'multiple', 'unique', 'noexist', 'included', 'weight']
+        'observable', 'time', 'matching_num', 'multiple', 'unique', 'noexist', 'included', 'determined', 'correct', 'weight']
     logger_list = []
     for i in range(p.n_obs_max-1):
         logger = log.Logger(p.log_dir, header)
@@ -146,7 +146,7 @@ def main(args):
         for i in range(p.n_obs_max-1):
             if i+2 <= n_obs_able:
                 # stats
-                matching_num, multiple, unique, noexist, included = calc_stats(
+                matching_num, multiple, unique, noexist, included, determined, correct = calc_stats(
                     candi_setid_each_list[i], obs_setid[:i+2])
                 weight = np.prod(weights[:i+2])
                 if i == 0:
@@ -155,9 +155,9 @@ def main(args):
                     time = time_list[i+1] - time_list[1]
                 # log
                 logger_list[i].append(
-                    [1, time, matching_num, int(multiple), int(unique), int(noexist), int(included), weight])
+                    [1, time, matching_num, int(multiple), int(unique), int(noexist), int(included), int(determined), int(correct), weight])
             else:
-                logger_list[i].append([0, -1, -1, -1, -1, -1, -1, -1])
+                logger_list[i].append([0, -1, -1, -1, -1, -1, -1, -1, -1, -1])
         #
         # if n_obs_able >= 2:
         #     if time_list[-1] - time_list[0] > 60.0:
@@ -170,17 +170,27 @@ def main(args):
 
 
 def calc_stats(candi_setids, obs_setid):
+    obs_set = set(obs_setid)
+    candi_set_list = [set(candi_setid) for candi_setid in candi_setids]
     # matching number
     matching_num = len(candi_setids)
     multiple = matching_num > 1
     unique = matching_num == 1
     noexist = matching_num == 0
     # correct pair is included in candidate pairs
-    included = False
-    for candi_setid in candi_setids:
-        if set(obs_setid) == set(candi_setid):
-            included = True
-    return matching_num, multiple, unique, noexist, included
+    included = obs_set in candi_set_list
+    # 
+    candi_intersect_set = candi_set_list[0] & candi_set_list[1]
+    for candi_set in candi_set_list[2:]:
+        candi_intersect_set = candi_intersect_set & candi_set
+    # 
+    if candi_intersect_set == set():
+        determined = False
+        correct = False
+    else:
+        determined = True
+        correct = candi_intersect_set <= obs_set
+    return matching_num, multiple, unique, noexist, included, determined, correct
 
 
 if __name__ == '__main__':

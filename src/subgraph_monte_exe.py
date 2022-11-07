@@ -12,9 +12,9 @@ def prepare_args():
     theta_FOV_list = [i*np.pi/180 for i in [5, 10, 30, 60]]
     # simulation
     theta_img_list = [np.pi/180*10**i for i in [
-        -5.0, -4.0, -3.0, -2.75, -2.5, -2.25, -2.0, -1.75, -1.5, -1.25, -1.0]]
+        -5.0, -4.5, -4.0, -3.5, -3.0, -2.5, -2.0, -1.5, -1.0]]
     # subgraph matching
-    k_list = [2.0**i for i in [0.0, 0.5, 1.0]]
+    k_list = [2.0**i for i in [-0.5, 0.0, 0.5, 1.0]]
 
     ###  ###
     theta_img = len(theta_img_list)
