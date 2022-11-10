@@ -9,9 +9,9 @@ import utils
 
 # Hyperparameter
 sampling_type = 0
-sample_N = 50000
+sample_N = 10000
 seed = 10
-n_obs_list = [2, 3, 4, 5, 6]
+n_obs_list = [2, 3, 4, 5, 6, 7, 8]
 # DB
 Vmax_list = [i+0.5 for i in [1, 2, 3, 4, 5]]
 theta_FOV_list = [i*np.pi/180 for i in [5, 10, 30, 60]]
@@ -71,9 +71,9 @@ def main():
             data['determined_prob'] = data['determined_num'] / data['obs_num']
             data['correct_num'] = df_obs['correct'].sum()
             data['correct_prob'] = data['correct_num'] / data['obs_num']
-            data['correct_determined_prob'] = (data['correct']*df_obs['determined']).sum()
+            data['correct_determined_prob'] = (df_obs['correct']*df_obs['determined']).sum()
             data['correct_prob_on_determined'] = data['correct_determined_prob'] / data['determined_prob']
-            data['incorrect_determined_prob'] = ((1 - data['correct'])*df_obs['determined']).sum()
+            data['incorrect_determined_prob'] = ((1 - df_obs['correct'])*df_obs['determined']).sum()
             data['incorrect_prob_on_determined'] = data['correct_prob'] / data['determined_prob']
         #
         data_set[i] = data

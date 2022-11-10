@@ -33,7 +33,7 @@ class Param:
     log_dir = './log/subgraph_monte/'
     seed = 10
     # simulation
-    sample_N = 50000
+    sample_N = 10000
     alpha = 0.99
     alpha_sampling = 0.9999
 
