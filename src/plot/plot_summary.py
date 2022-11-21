@@ -145,7 +145,7 @@ def main():
 
     # plot
     condi_col = ['n_obs', 'Vmax', 'theta_FOV', 'theta_img', 'k']
-    condi_value_list = [n_obs_list, Vmax_list,theta_FOV_list, theta_img_list, k_list]
+    condi_value_list = [n_obs_list, Vmax_list, theta_FOV_list, theta_img_list, k_list]
     #
     plot_hist(df_summary, condi_col, tag=tag)
     #
