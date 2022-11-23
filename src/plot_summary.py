@@ -16,7 +16,7 @@ utils.font_setting()
 
 # Hyperparameter
 sampling_type = 0
-sample_N = 50000
+sample_N = 10000
 seed = 10
 # n_obs_list = [2, 3, 4, 5, 6, 7, 8]
 # # DB
@@ -30,15 +30,15 @@ seed = 10
 # param_col, 'Vmax', 'theta_FOV', 'theta_img', 'k'
 
 
-n_obs_list = [2, 3, 4, 5, 6]
+n_obs_list = [2, 3, 4, 5, 6, 7, 8]
 # DB
 Vmax_list = [i+0.5 for i in [1, 2, 3, 4, 5]]
 theta_FOV_list = [i*np.pi/180 for i in [5, 10, 30, 60]]
 # simulation
 theta_img_list = [np.pi/180*10**i for i in [
-    -5.0, -4.0, -3.0, -2.75, -2.5, -2.25, -2.0, -1.75, -1.5, -1.25, -1.0]]
+    -5.0, -4.5, -4.0, -3.5, -3.0, -2.5, -2.0, -1.5, -1.0]]
 # subgraph matching
-k_list = [2.0**i for i in [0.0, 0.5, 1.0]]
+k_list = [2.0**i for i in [-0.5, 0.0, 0.5, 1.0]]
 
 epsilon_list = [pair[0]*pair[1]
                 for pair in list(itertools.product(theta_img_list, k_list))]
@@ -79,8 +79,10 @@ def plot_tar(df_summary, target_col, condi_col, condi_value_list, tag=''):
         condition_params_list, df_list = split_df(
             df_summary, condi_cols, condi_value_lists)
         for df in df_list:
-            axes[i].plot(df[param_col], df[target_col], ls='-', lw=0.2)
-            if param_col == 'theta_img':
+            axes[i].plot(df[param_col], df[target_col],
+                         color='black', ls='-', lw=0.2)
+            # axes[i].plot(df[param_col], df[target_col], ls='-', lw=0.2)
+            if param_col == 'theta_img' or param_col == 'epsilon':
                 axes[i].set_xscale('log')
             axes[i].set_ylabel(target_col)
             axes[i].set_xlabel(param_col)
@@ -89,6 +91,77 @@ def plot_tar(df_summary, target_col, condi_col, condi_value_list, tag=''):
     if not os.path.isdir(f'./img/{tag}'):
         os.makedirs(f'./img/{tag}')
     fig.savefig(f'./img/{tag}/{target_col}.pdf')
+    plt.close(fig)
+
+
+def plot_tar_2(
+        df_summary, target_col,
+        condi_col, condi_value_list,
+        split_col, split_value, split_color, tag=''):
+    scale = 3
+    fig = plt.figure(figsize=(scale*len(condi_col), scale))
+    axes = []
+    for i in range(len(condi_col)):
+        axes.append(fig.add_subplot(1, len(condi_col), i+1))
+
+    for i, param_col in enumerate(condi_col):
+        condi_cols = copy.copy(condi_col)
+        condi_cols.pop(i)
+        condi_value_lists = copy.copy(condi_value_list)
+        condi_value_lists.pop(i)
+        #
+        for j, value in enumerate(split_value):
+            c_temp_low = (df_summary[split_col] > value - np.abs(value)*1.0e-1)
+            c_temp_high = (df_summary[split_col] <
+                           value + np.abs(value)*1.0e-1)
+            df_split = df_summary[c_temp_low & c_temp_high]
+            #
+            condition_params_list, df_list = split_df(
+                df_split, condi_cols, condi_value_lists)
+            for df in df_list:
+                axes[i].plot(df[param_col], df[target_col],
+                             color=split_color[j], ls='-', lw=0.2)
+                if param_col == 'theta_img' or param_col == 'epsilon':
+                    axes[i].set_xscale('log')
+                axes[i].set_ylabel(target_col)
+                axes[i].set_xlabel(param_col)
+    #
+    fig.tight_layout()
+    if not os.path.isdir(f'./img/{tag}'):
+        os.makedirs(f'./img/{tag}')
+    fig.savefig(f'./img/{tag}/{target_col}.pdf')
+    plt.close(fig)
+
+
+def plot_tar_3(df_summary, target_col, target_col_2, condi_col, condi_value_list, tag=''):
+    scale = 3
+    fig = plt.figure(figsize=(scale*len(condi_col), scale))
+    axes = []
+    for i in range(len(condi_col)):
+        axes.append(fig.add_subplot(1, len(condi_col), i+1))
+
+    for i, param_col in enumerate(condi_col):
+        condi_cols = copy.copy(condi_col)
+        condi_cols.pop(i)
+        condi_value_lists = copy.copy(condi_value_list)
+        condi_value_lists.pop(i)
+        #
+        condition_params_list, df_list = split_df(
+            df_summary, condi_cols, condi_value_lists)
+        for df in df_list:
+            axes[i].plot(df[target_col_2], df[target_col],
+                         color='black', ls='-', lw=0.2)
+            # axes[i].plot(df[param_col], df[target_col], ls='-', lw=0.2)
+            if param_col == 'theta_img' or param_col == 'epsilon':
+                axes[i].set_xscale('log')
+            axes[i].set_title(param_col)
+            axes[i].set_ylabel(target_col)
+            axes[i].set_xlabel(target_col_2)
+    #
+    fig.tight_layout()
+    if not os.path.isdir(f'./img/{tag}'):
+        os.makedirs(f'./img/{tag}')
+    fig.savefig(f'./img/{tag}/{target_col}_{target_col_2}.pdf')
     plt.close(fig)
 
 
@@ -208,11 +281,97 @@ def main():
     df_summary = pd.read_csv(
         log_dir + f'summary_{sample_N}_{seed}.csv', index_col=0)
     df_summary.head()
-    # condition
-    tag = ''
-    #
-    plot_obs_prob(df_summary, tag=tag)
-    plot_time_and_matching_num(df_summary, tag=tag)
+
+    ### all ###
+    tag = 'all'
+    df = df_summary
+
+    target_col = 'time_mean'
+    condi_col = ['n_obs', 'Vmax', 'theta_FOV', 'epsilon']
+    condi_value_list = [n_obs_list, Vmax_list, theta_FOV_list, epsilon_list]
+    plot_tar(df, target_col, condi_col, condi_value_list, tag=tag)
+
+    target_col = 'correct_prob_on_determined'
+    condi_col = ['n_obs', 'Vmax', 'theta_FOV', 'theta_img', 'k']
+    condi_value_list = [
+        n_obs_list, Vmax_list, theta_FOV_list, theta_img_list, k_list]
+    plot_tar(df, target_col, condi_col, condi_value_list, tag=tag)
+
+    target_col = 'incorrect_prob_on_determined'
+    condi_col = ['n_obs', 'Vmax', 'theta_FOV', 'theta_img', 'k']
+    condi_value_list = [
+        n_obs_list, Vmax_list, theta_FOV_list, theta_img_list, k_list]
+    plot_tar(df, target_col, condi_col, condi_value_list, tag=tag)
+
+    ### k > 1.0 ###
+    tag = 'k>1.0'
+    df = df_summary[df_summary['k'] > 1.01]
+
+    target_col = 'determined_prob'
+    condi_col = ['n_obs', 'Vmax', 'theta_FOV', 'theta_img', 'k']
+    condi_value_list = [
+        n_obs_list, Vmax_list, theta_FOV_list, theta_img_list, k_list]
+    plot_tar(df, target_col, condi_col, condi_value_list, tag=tag)
+
+    ### k < 1.0 ###
+    tag = 'k<1.0'
+    df = df_summary[df_summary['k'] < 1.01]
+
+    target_col = 'determined_prob'
+    condi_col = ['n_obs', 'Vmax', 'theta_FOV', 'theta_img', 'k']
+    condi_value_list = [
+        n_obs_list, Vmax_list, theta_FOV_list, theta_img_list, k_list]
+    plot_tar(df, target_col, condi_col, condi_value_list, tag=tag)
+
+    ## k ###
+    tag = 'ksplit'
+    df = df_summary
+
+    target_col = 'determined_prob'
+    condi_col = ['n_obs', 'Vmax', 'theta_FOV', 'theta_img']
+    split_col = 'k'
+    condi_value_list = [
+        n_obs_list, Vmax_list, theta_FOV_list, theta_img_list]
+    split_value = k_list
+    split_color = ['black', 'r', 'b', 'g']
+    plot_tar_2(df, target_col, condi_col, condi_value_list,
+               split_col, split_value, split_color, tag=tag)
+
+    ### k < 1 and n_obs > 2 ###
+    tag = 'k<1andn_obs>2'
+    flag = (df_summary['k'] < 1.01) & (df_summary['n_obs'] > 2.5)
+    df = df_summary[flag]
+
+    target_col = 'determined_prob'
+    condi_col = ['n_obs', 'Vmax', 'theta_FOV', 'theta_img', 'k']
+    condi_value_list = [
+        n_obs_list, Vmax_list, theta_FOV_list, theta_img_list, k_list]
+    plot_tar(df, target_col, condi_col, condi_value_list, tag=tag)
+
+    ### k > 1 or n_obs = 2 ###
+    tag = 'k>1orn_obs=2'
+    flag = (df_summary['k'] < 1.01) & (df_summary['n_obs'] > 2.5)
+    df = df_summary[~flag]
+
+    target_col = 'determined_prob'
+    condi_col = ['n_obs', 'Vmax', 'theta_FOV', 'theta_img', 'k']
+    condi_value_list = [
+        n_obs_list, Vmax_list, theta_FOV_list, theta_img_list, k_list]
+    plot_tar(df, target_col, condi_col, condi_value_list, tag=tag)
+
+    target_col = 'obs_prob'
+    condi_col = ['n_obs', 'Vmax', 'theta_FOV', 'theta_img', 'k']
+    condi_value_list = [
+        n_obs_list, Vmax_list, theta_FOV_list, theta_img_list, k_list]
+    plot_tar(df, target_col, condi_col, condi_value_list, tag=tag)
+
+    target_col = 'determined_prob'
+    target_col_2 = 'obs_prob'
+    condi_col = ['n_obs', 'Vmax', 'theta_FOV', 'theta_img', 'k']
+    condi_value_list = [
+        n_obs_list, Vmax_list, theta_FOV_list, theta_img_list, k_list]
+    plot_tar_3(df, target_col, target_col_2,
+               condi_col, condi_value_list, tag=tag)
 
 
 if __name__ == '__main__':

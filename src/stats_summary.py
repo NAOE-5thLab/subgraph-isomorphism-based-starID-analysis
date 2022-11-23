@@ -71,10 +71,24 @@ def main():
             data['determined_prob'] = data['determined_num'] / data['obs_num']
             data['correct_num'] = df_obs['correct'].sum()
             data['correct_prob'] = data['correct_num'] / data['obs_num']
-            data['correct_determined_prob'] = (df_obs['correct']*df_obs['determined']).sum()
-            data['correct_prob_on_determined'] = data['correct_determined_prob'] / data['determined_prob']
-            data['incorrect_determined_prob'] = ((1 - df_obs['correct'])*df_obs['determined']).sum()
-            data['incorrect_prob_on_determined'] = data['correct_prob'] / data['determined_prob']
+            #
+            data['correct_determined_num'] = (
+                df_obs['correct']*df_obs['determined']).sum()
+            data['correct_determined_prob'] = data['correct_determined_num'] / \
+                data['obs_num']
+            data['incorrect_determined_num'] = (
+                (1 - df_obs['correct'])*df_obs['determined']).sum()
+            data['incorrect_determined_prob'] = data['incorrect_determined_num'] / \
+                data['obs_num']
+            #
+            if data['determined_prob'] == 0.0:
+                data['correct_prob_on_determined'] = None
+                data['incorrect_prob_on_determined'] = None
+            else:
+                data['correct_prob_on_determined'] = data['correct_determined_prob'] / \
+                    data['determined_prob']
+                data['incorrect_prob_on_determined'] = data['incorrect_determined_prob'] / \
+                    data['determined_prob']
         #
         data_set[i] = data
     #
