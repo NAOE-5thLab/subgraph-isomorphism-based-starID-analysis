@@ -5,30 +5,17 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
+from config import Param
 import utils
-
-# Hyperparameter
-sampling_type = 0
-sample_N = 10000
-seed = 10
-n_obs_list = [2, 3, 4, 5, 6, 7, 8]
-# DB
-Vmax_list = [i+0.5 for i in [1, 2, 3, 4, 5]]
-theta_FOV_list = [i*np.pi/180 for i in [5, 10, 30, 60]]
-# simulation
-theta_img_list = [np.pi/180*10**i for i in [
-    -5.0, -4.5, -4.0, -3.5, -3.0, -2.5, -2.0, -1.5, -1.0]]
-# subgraph matching
-k_list = [2.0**i for i in [-0.5, 0.0, 0.5, 1.0]]
-# system
-log_dir = './log/subgraph_monte/'
 
 
 def main():
     utils.font_setting()
     #
-    ps = list(itertools.product(n_obs_list, Vmax_list,
-                                theta_FOV_list, theta_img_list, k_list))
+    conf = Param()
+    ps = list(itertools.product(
+        conf.n_obs_list, conf.Vmax_list,
+        conf.theta_FOV_list, conf.theta_img_list, conf.k_list))
     #
     data_set = {}
     for i, [n_obs, Vmax, theta_FOV, theta_img, k] in enumerate(tqdm.tqdm(ps)):
@@ -41,8 +28,8 @@ def main():
         data['k'] = k
         data['epsilon'] = theta_img*k
         #
-        fname = f'stats_{sample_N}_{seed}_{n_obs}_{Vmax}_{theta_FOV*180/np.pi}_{theta_img*180/np.pi}_{k}_{sampling_type}'
-        df = pd.read_csv(log_dir + fname + '.csv', index_col=0)
+        fname = f'stats_{n_obs}_{Vmax}_{theta_FOV*180/np.pi}_{theta_img*180/np.pi}_{k}'
+        df = pd.read_csv(conf.log_dir + fname + '.csv', index_col=0)
 
         ### calc stats ###
         #
@@ -93,7 +80,7 @@ def main():
         data_set[i] = data
     #
     df = pd.DataFrame.from_dict(data_set, orient="index")
-    df.to_csv(log_dir + f'summary_{sample_N}_{seed}.csv')
+    df.to_csv(conf.log_dir + f'summary.csv')
 
 
 if __name__ == '__main__':

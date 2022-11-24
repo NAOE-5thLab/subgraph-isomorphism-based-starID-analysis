@@ -9,43 +9,10 @@ import seaborn as sns
 import matplotlib
 import matplotlib.pyplot as plt
 
+from config import Param
 import utils
 
 utils.font_setting()
-
-
-# Hyperparameter
-sampling_type = 0
-sample_N = 10000
-seed = 10
-# n_obs_list = [2, 3, 4, 5, 6, 7, 8]
-# # DB
-# Vmax_list = [i+0.5 for i in [1, 2, 3, 4, 5]]
-# theta_FOV_list = [i*np.pi/180 for i in [5, 10, 30, 60]]
-# # simulation
-# theta_img_list = [np.pi/180*10**i for i in [
-#     -5.0, -4.5, -4.0, -3.5, -3.0, -2.5, -2.0, -1.5, -1.0]]
-# # subgraph matching
-# k_list = [2.0**i for i in [-0.5, 0.0, 0.5, 1.0]]
-# param_col, 'Vmax', 'theta_FOV', 'theta_img', 'k'
-
-
-n_obs_list = [2, 3, 4, 5, 6, 7, 8]
-# DB
-Vmax_list = [i+0.5 for i in [1, 2, 3, 4, 5]]
-theta_FOV_list = [i*np.pi/180 for i in [5, 10, 30, 60]]
-# simulation
-theta_img_list = [np.pi/180*10**i for i in [
-    -5.0, -4.5, -4.0, -3.5, -3.0, -2.5, -2.0, -1.5, -1.0]]
-# subgraph matching
-k_list = [2.0**i for i in [-0.5, 0.0, 0.5, 1.0]]
-
-epsilon_list = [pair[0]*pair[1]
-                for pair in list(itertools.product(theta_img_list, k_list))]
-epsilon_list = sorted(list(set(epsilon_list)))
-
-# system
-log_dir = './log/subgraph_monte/'
 
 
 def split_df(df, condi_col, condi_value_list):
@@ -277,9 +244,14 @@ def plot_time_and_matching_num(df_summary, tag=''):
 
 
 def main():
+    conf = Param()
+    epsilon_list = [pair[0]*pair[1]
+                for pair in list(itertools.product(conf.theta_img_list, conf.k_list))]
+    epsilon_list = sorted(list(set(epsilon_list)))
+
     # Load
     df_summary = pd.read_csv(
-        log_dir + f'summary_{sample_N}_{seed}.csv', index_col=0)
+        conf.log_dir + f'summary.csv', index_col=0)
     df_summary.head()
 
     ### all ###
@@ -288,19 +260,19 @@ def main():
 
     target_col = 'time_mean'
     condi_col = ['n_obs', 'Vmax', 'theta_FOV', 'epsilon']
-    condi_value_list = [n_obs_list, Vmax_list, theta_FOV_list, epsilon_list]
+    condi_value_list = [conf.n_obs_list, conf.Vmax_list, conf.theta_FOV_list, epsilon_list]
     plot_tar(df, target_col, condi_col, condi_value_list, tag=tag)
 
     target_col = 'correct_prob_on_determined'
     condi_col = ['n_obs', 'Vmax', 'theta_FOV', 'theta_img', 'k']
     condi_value_list = [
-        n_obs_list, Vmax_list, theta_FOV_list, theta_img_list, k_list]
+        conf.n_obs_list, conf.Vmax_list, conf.theta_FOV_list, conf.theta_img_list, conf.k_list]
     plot_tar(df, target_col, condi_col, condi_value_list, tag=tag)
 
     target_col = 'incorrect_prob_on_determined'
     condi_col = ['n_obs', 'Vmax', 'theta_FOV', 'theta_img', 'k']
     condi_value_list = [
-        n_obs_list, Vmax_list, theta_FOV_list, theta_img_list, k_list]
+        conf.n_obs_list, conf.Vmax_list, conf.theta_FOV_list, conf.theta_img_list, conf.k_list]
     plot_tar(df, target_col, condi_col, condi_value_list, tag=tag)
 
     ### k > 1.0 ###
@@ -310,7 +282,7 @@ def main():
     target_col = 'determined_prob'
     condi_col = ['n_obs', 'Vmax', 'theta_FOV', 'theta_img', 'k']
     condi_value_list = [
-        n_obs_list, Vmax_list, theta_FOV_list, theta_img_list, k_list]
+        conf.n_obs_list, conf.Vmax_list, conf.theta_FOV_list, conf.theta_img_list, conf.k_list]
     plot_tar(df, target_col, condi_col, condi_value_list, tag=tag)
 
     ### k < 1.0 ###
@@ -320,7 +292,7 @@ def main():
     target_col = 'determined_prob'
     condi_col = ['n_obs', 'Vmax', 'theta_FOV', 'theta_img', 'k']
     condi_value_list = [
-        n_obs_list, Vmax_list, theta_FOV_list, theta_img_list, k_list]
+        conf.n_obs_list, conf.Vmax_list, conf.theta_FOV_list, conf.theta_img_list, conf.k_list]
     plot_tar(df, target_col, condi_col, condi_value_list, tag=tag)
 
     ## k ###
@@ -331,8 +303,8 @@ def main():
     condi_col = ['n_obs', 'Vmax', 'theta_FOV', 'theta_img']
     split_col = 'k'
     condi_value_list = [
-        n_obs_list, Vmax_list, theta_FOV_list, theta_img_list]
-    split_value = k_list
+        conf.n_obs_list, conf.Vmax_list, conf.theta_FOV_list, conf.theta_img_list, conf.k_list]
+    split_value = conf.k_list
     split_color = ['black', 'r', 'b', 'g']
     plot_tar_2(df, target_col, condi_col, condi_value_list,
                split_col, split_value, split_color, tag=tag)
@@ -345,7 +317,7 @@ def main():
     target_col = 'determined_prob'
     condi_col = ['n_obs', 'Vmax', 'theta_FOV', 'theta_img', 'k']
     condi_value_list = [
-        n_obs_list, Vmax_list, theta_FOV_list, theta_img_list, k_list]
+        conf.n_obs_list, conf.Vmax_list, conf.theta_FOV_list, conf.theta_img_list, conf.k_list]
     plot_tar(df, target_col, condi_col, condi_value_list, tag=tag)
 
     ### k > 1 or n_obs = 2 ###
@@ -356,20 +328,20 @@ def main():
     target_col = 'determined_prob'
     condi_col = ['n_obs', 'Vmax', 'theta_FOV', 'theta_img', 'k']
     condi_value_list = [
-        n_obs_list, Vmax_list, theta_FOV_list, theta_img_list, k_list]
+        conf.n_obs_list, conf.Vmax_list, conf.theta_FOV_list, conf.theta_img_list, conf.k_list]
     plot_tar(df, target_col, condi_col, condi_value_list, tag=tag)
 
     target_col = 'obs_prob'
     condi_col = ['n_obs', 'Vmax', 'theta_FOV', 'theta_img', 'k']
     condi_value_list = [
-        n_obs_list, Vmax_list, theta_FOV_list, theta_img_list, k_list]
+        conf.n_obs_list, conf.Vmax_list, conf.theta_FOV_list, conf.theta_img_list, conf.k_list]
     plot_tar(df, target_col, condi_col, condi_value_list, tag=tag)
 
     target_col = 'determined_prob'
     target_col_2 = 'obs_prob'
     condi_col = ['n_obs', 'Vmax', 'theta_FOV', 'theta_img', 'k']
     condi_value_list = [
-        n_obs_list, Vmax_list, theta_FOV_list, theta_img_list, k_list]
+        conf.n_obs_list, conf.Vmax_list, conf.theta_FOV_list, conf.theta_img_list, conf.k_list]
     plot_tar_3(df, target_col, target_col_2,
                condi_col, condi_value_list, tag=tag)
 

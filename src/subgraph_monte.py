@@ -41,31 +41,7 @@ def calc_stats(candi_setids, obs_setid):
     return matching_num, multiple, unique, noexist, included, determined, correct
 
 
-def main():
-    # argument
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--i_Vmax",
-        type=int, default=4,
-        help="ganbare")
-    parser.add_argument(
-        "--i_theta_FOV",
-        type=int, default=2,
-        help="ganbare")
-    parser.add_argument(
-        "--i_theta_img",
-        type=int, default=4,
-        help="ganbare")
-    parser.add_argument(
-        "--i_k",
-        type=int, default=3,
-        help="ganbare")
-    parser.add_argument(
-        "--i_parallel",
-        type=int, default=0,
-        help="ganbare")
-    args = parser.parse_args()
-
+def main(args):
     ### Prepair PARAMETER ###
     conf = Param()
     Vmax = conf.Vmax_list[args.i_Vmax]
@@ -145,7 +121,7 @@ def main():
                 matching_num, multiple, unique, noexist, included, determined, correct = calc_stats(
                     candi_setid_each_list[i], obs_setid[:i+2])
                 if i == 0:
-                    time = time_list[i+1] - time_list[0]
+                    time = time_list[1] - time_list[0]
                 else:
                     time = time_list[i+1] - time_list[1]
                 # log
@@ -154,7 +130,7 @@ def main():
                      int(noexist), int(included), int(determined), int(correct)])
             else:
                 logger_list[i].append(
-                    [sim_seed, 0, None, None, None, None, None, None, None, None])
+                    [sim_seed, 0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0])
     # save
     for i, n_obs in enumerate(conf.n_obs_list):
         fname = f'stats_{i_parallel}_{n_obs}_{Vmax}_{theta_FOV*180/np.pi}_{theta_img*180/np.pi}_{k}'
@@ -163,26 +139,50 @@ def main():
     ### Marge Results ###
     finish = True
     for i in range(conf.parallel_num):
-        fname = f'stats_{i}_{n_obs}_{Vmax}_{theta_FOV*180/np.pi}_{theta_img*180/np.pi}_{k}'
+        fname = f'stats_{i}_{conf.n_obs_list[-1]}_{Vmax}_{theta_FOV*180/np.pi}_{theta_img*180/np.pi}_{k}'
         if not os.path.isfile(conf.log_temp_dir + '/' + f'{fname}.csv'):
             finish = False
             break
     if finish:
-        data_list = []
-        for i in range(conf.parallel_num):
-            fname = f'stats_{i}_{n_obs}_{Vmax}_{theta_FOV*180/np.pi}_{theta_img*180/np.pi}_{k}'
-            data = pd.read_csv(
-                conf.log_temp_dir + '/' + f'{fname}.csv', header=0, index_col=0).to_numpy()
-            data_list.append(data)
-            #
-            os.remove(conf.log_temp_dir + '/' + f'{fname}.csv')
-        marged_data = np.concatenate(data_list, axis=0)
-        # save
-        df = pd.DataFrame(marged_data, columns=header)
-        marged_fname = f'stats_{n_obs}_{Vmax}_{theta_FOV*180/np.pi}_{theta_img*180/np.pi}_{k}'
-        df.to_csv(conf.log_dir + marged_fname + '.csv')
+        for n_obs in conf.n_obs_list:
+            data_list = []
+            for i in range(conf.parallel_num):
+                fname = f'stats_{i}_{n_obs}_{Vmax}_{theta_FOV*180/np.pi}_{theta_img*180/np.pi}_{k}'
+                data = pd.read_csv(
+                    conf.log_temp_dir + '/' + f'{fname}.csv', header=0, index_col=0).to_numpy()
+                data_list.append(data)
+                #
+                os.remove(conf.log_temp_dir + '/' + f'{fname}.csv')
+            marged_data = np.concatenate(data_list, axis=0)
+            # save
+            df = pd.DataFrame(marged_data, columns=header)
+            marged_fname = f'stats_{n_obs}_{Vmax}_{theta_FOV*180/np.pi}_{theta_img*180/np.pi}_{k}'
+            df.to_csv(conf.log_dir + marged_fname + '.csv')
 
 
 if __name__ == '__main__':
-    main()
+    # argument
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--i_Vmax",
+        type=int, default=4,
+        help="ganbare")
+    parser.add_argument(
+        "--i_theta_FOV",
+        type=int, default=2,
+        help="ganbare")
+    parser.add_argument(
+        "--i_theta_img",
+        type=int, default=4,
+        help="ganbare")
+    parser.add_argument(
+        "--i_k",
+        type=int, default=3,
+        help="ganbare")
+    parser.add_argument(
+        "--i_parallel",
+        type=int, default=0,
+        help="ganbare")
+    args = parser.parse_args()
+    main(args)
     print('Task complete')

@@ -20,6 +20,6 @@ class Param:
     log_dir = './log/subgraph_monte/'
     log_temp_dir = './log/subgraph_monte/temp/'
     # simulation
-    calc_seeds = range(10000)
-    parallel_num = 10
+    calc_seeds = range(100000)
+    parallel_num = 20
     alpha = 0.99
