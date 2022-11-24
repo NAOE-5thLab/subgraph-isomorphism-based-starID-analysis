@@ -1,46 +1,47 @@
-import numpy as np
+import os
 import time
 import subprocess
 
+import numpy as np
 import psutil
 
-
-def prepare_args():
-    ### Hyperparameter ###
-    # DB
-    Vmax_list = [i+0.5 for i in [1, 2, 3, 4, 5]]
-    theta_FOV_list = [i*np.pi/180 for i in [5, 10, 30, 60]]
-    # simulation
-    theta_img_list = [np.pi/180*10**i for i in [
-        -5.0, -4.5, -4.0, -3.5, -3.0, -2.5, -2.0, -1.5, -1.0]]
-    # subgraph matching
-    k_list = [2.0**i for i in [-0.5, 0.0, 0.5, 1.0]]
-
-    ###  ###
-    theta_img = len(theta_img_list)
-    k = len(k_list)
-    Vmax = len(Vmax_list)
-    theta_FOV = len(theta_FOV_list)
-    #
-    args_list = []
-    for a in range(theta_img-1, -1, -1):
-        for b in range(k-1, -1, -1):
-            for c in range(Vmax-1, -1, -1):
-                for d in range(theta_FOV-1, -1, -1):
-                    args_list.append([a, b, c, d])
-    return args_list
+from config import Param
 
 
 def main():
-    args_list = prepare_args()
+    conf = Param()
+    #
+    args_list = []
+    for i_Vmax in range(len(conf.Vmax_list)-1, -1, -1):
+        for i_theta_FOV in range(len(conf.theta_FOV_list)-1, -1, -1):
+            for i_theta_img in range(len(conf.theta_img_list)-1, -1, -1):
+                for i_k in range(len(conf.k_list)-1, -1, -1):
+                    for i_parallel in range(conf.parallel_num):
+                        args_list.append(
+                            [i_Vmax, i_theta_FOV, i_theta_img, i_k, i_parallel])
     # init
     counter = 0
     #
     while True:
+        args = args_list[counter]
+
+        fname = f'''
+            stats_{conf.n_obs_list[-1]}_{conf.Vmax_list[args[0]]}_{conf.theta_FOV_list[args[1]]*180/np.pi}_{conf.theta_img_list[args[2]]*180/np.pi}_{conf.k_list[args[3]]}
+        '''
+        if os.path.isfile(conf.log_temp_dir + '/' + f'{fname}.csv'):
+            counter += 1
+            if counter >= len(args_list):
+                break
+            else:
+                continue
+        #
         cpu = psutil.cpu_percent(interval=1)
         if cpu < 95.0:
-            args = args_list[counter]
-            cmd = f'start python subgraph_monte.py --theta_img {args[0]} --k {args[1]} --Vmax {args[2]} --theta_FOV {args[3]}'
+            cmd = f'''
+                start python subgraph_monte.p 
+                --Vmax {args[0]} --theta_FOV {args[1]} 
+                --theta_img {args[2]} --k {args[3]} --i_parallel {args[4]}
+            '''
             res = subprocess.call(cmd, shell=True)
             if res != 0:
                 print(args)
