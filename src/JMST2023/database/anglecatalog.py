@@ -23,7 +23,7 @@ class InterAngleCatalog:
         #
         self.log_dir = log_dir
 
-    def create_catalog(self, FOV=deg2rad(30), use_log=False):
+    def create_catalog(self, theta_max=deg2rad(30), use_log=False):
         if use_log:
             angle_df = pd.read_csv(f'{self.log_dir}/angle_catalog.csv')
             angles_filtered = angle_df['angle'].to_numpy()
@@ -39,8 +39,8 @@ class InterAngleCatalog:
             inter_angles = inter_star_angle_RADE(
                 self.RA[pair_index[:, 0]], self.DE[pair_index[:, 0]],
                 self.RA[pair_index[:, 1]], self.DE[pair_index[:, 1]])
-            # Pairs in FOV
-            filter_FOV = inter_angles < FOV
+            # Pairs in theta_max
+            filter_FOV = inter_angles < theta_max
             angles_filtered = inter_angles[filter_FOV]
             pair_index_filtered = pair_index[filter_FOV]
             angle_df = pd.DataFrame(angles_filtered, columns=['angle'])
@@ -85,7 +85,7 @@ def test():
     star_ctlg.filtering_by_multiple_stars(multi_angle)
     angle_ctlg = InterAngleCatalog(
         star_ctlg.get_ID(), star_ctlg.get_RA(), star_ctlg.get_DE())
-    angle_ctlg.create_catalog(FOV=FOV, use_log=False)
+    angle_ctlg.create_catalog(theta_max=FOV, use_log=False)
 
 
 if __name__ == '__main__':

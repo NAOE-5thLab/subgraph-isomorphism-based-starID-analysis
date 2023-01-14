@@ -15,6 +15,7 @@ from utils.seeds import gen_seeds
 from utils.spherical_ramdom_vector import limit_uniform_spherical_vector
 from utils.rotation import rodrigues_rotation_matrix
 from utils.font import font_setting
+from utils.inter_star_angle import inter_star_angle_vec
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -93,7 +94,7 @@ log_dir = './log/'
 pattern = patterns[args.i]
 # config
 seed = 100
-roopN = 10000
+roopN = 1000
 U = 4096
 limitMv = 5.5
 
@@ -104,6 +105,7 @@ cover_alpha = pattern['alpha']
 
 sigma = np.arctan2(2*np.tan(FOV*0.5), U)
 epsilon = 2*sigma
+theta_max = 2*np.arctan2(np.sqrt(2)*np.tan(FOV*0.5), 1)
 
 
 def main():
@@ -121,7 +123,7 @@ def main():
     angle_ctlg = InterAngleCatalog(
         star_ctlg.get_ID(), star_ctlg.get_RA(), star_ctlg.get_DE(),
         log_dir=log_dir)
-    angle_ctlg.create_catalog(FOV=FOV, use_log=False)
+    angle_ctlg.create_catalog(theta_max=theta_max, use_log=False)
 
     ### MONTE CARLO SIMULATION ###
     # observe catalog
@@ -188,6 +190,9 @@ def main():
                 match = obs_set == candi_set
             else:
                 match = False
+            # 
+            if N_candi == 0:
+                print(f'!!! Warning : N_candi is zero in {round}!!!')
         else:
             match = False
             for di in range(1, N_obs - 3 + 1):
