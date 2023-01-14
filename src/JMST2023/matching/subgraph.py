@@ -2,15 +2,15 @@ import numpy as np
 import subgraph_f
 
 
-def matching_set_for_analysis(n_obs, s_hat_set, epsilon, ID, RA, DE, pairID, interangles):
-    N_set = len(ID)
+def matching_set_for_analysis(n_obs, s_hat_set, epsilon, RA, DE, pair_index, interangles):
+    N_set = len(RA)
     N_pairset = len(interangles)
     N_candi = N_pairset
     #
     N_candi_setid, candi_setid, time = subgraph_f.subgraph_isomorphism_starid_detector.matching_set_for_analysis(
         n_obs=n_obs, s_hat_set=s_hat_set, epsilon=epsilon,
         n_candi=N_candi, n_set=N_set, ra_set=RA, de_set=DE,
-        n_pairset=N_pairset, thetaset=interangles, pairidset=pairID)
+        n_pairset=N_pairset, thetaset=interangles, pairidset=pair_index)
     #
     candi_setid_each_list = []
     for i in range(n_obs-1):

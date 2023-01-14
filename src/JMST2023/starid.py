@@ -20,7 +20,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument(
     "--i",
     type=int,
-    default=24,
+    default=8,
     help="degree")
 args = parser.parse_args()
 
@@ -93,7 +93,7 @@ log_dir = './log/'
 pattern = patterns[args.i]
 # config
 seed = 100
-roopN = 1000
+roopN = 10000
 U = 4096
 limitMv = 5.5
 
@@ -127,7 +127,7 @@ def main():
     # observe catalog
     obs_star_ctlg = StarCatalog(yale.get_HR(), yale.get_RA(), yale.get_DE())
     obs_star_ctlg.filtering_by_visual_magnitude(yale.get_Vmag(), limitMv)
-    obs_star_ctlg.filtering_by_multiple_stars(epsilon)    
+    obs_star_ctlg.filtering_by_multiple_stars(epsilon)
     obs_star_ctlg.filtering_by_visual_magnitude(yale.get_Vmag(), obsMv)
     s_vec = equatorial2vec(obs_star_ctlg.get_RA(), obs_star_ctlg.get_DE())
     N_catalog = len(s_vec)
@@ -138,8 +138,8 @@ def main():
     # main loop
     for round in tqdm.tqdm(range(roopN)):
         # seed
-        sim_seeds = gen_seeds(round+seed, 1)
-        np.random.seed(seed=sim_seeds)
+        sim_seed = gen_seeds(round+seed, 1)[0]
+        np.random.seed(seed=sim_seed)
         ### Observed stars ###
         # rotation
         R = special_ortho_group.rvs(dim=3, size=1)
@@ -166,21 +166,25 @@ def main():
              np.zeros_like(obs_ID)[:, np.newaxis]],
             axis=1)
         R_s_vec = rodrigues_rotation_matrix(0.5*np.pi-obs_DE, axis_vec)
-        obs_s_vec = rotate_(R_s_vec, obs_noise)
+        if len(obs_ID)==1:
+            obs_s_vec = rotate_(R_s_vec, obs_noise[np.newaxis, :])
+        else:
+            obs_s_vec = rotate_(R_s_vec, obs_noise)
         ### Matching ###
         N_obs = len(obs_s_vec)
         if N_obs < 2:
+            N_candi = 0
             match = False
         elif N_obs < 5:
             candi_setid_each_list, time_list = matching_set_for_analysis(
                 N_obs, obs_s_vec, epsilon,
-                star_ctlg.get_ID(), star_ctlg.get_RA(), star_ctlg.get_DE(),
+                star_ctlg.get_RA(), star_ctlg.get_DE(),
                 angle_ctlg.get_pair_index(), angle_ctlg.get_inter_angles())
-            candi_id = candi_setid_each_list[N_obs - 2]
-            N_candi = len(candi_id)
+            candi_index = candi_setid_each_list[N_obs - 2]
+            N_candi = len(candi_index)
             if N_candi == 1:
                 obs_set = set(obs_ID)
-                candi_set = set(candi_id)
+                candi_set = set(star_ctlg.get_ID()[candi_index[0]])
                 match = obs_set == candi_set
             else:
                 match = False
@@ -195,13 +199,13 @@ def main():
                             l = k + dk
                             candi_setid_each_list, time_list = matching_set_for_analysis(
                                 4, obs_s_vec[[i, j, k, l]], epsilon,
-                                star_ctlg.get_ID(), star_ctlg.get_RA(), star_ctlg.get_DE(),
+                                star_ctlg.get_RA(), star_ctlg.get_DE(),
                                 angle_ctlg.get_pair_index(), angle_ctlg.get_inter_angles())
-                            candi_id = candi_setid_each_list[4 - 2]
-                            N_candi = len(candi_id)
+                            candi_index = candi_setid_each_list[4 - 2]
+                            N_candi = len(candi_index)
                             if N_candi == 1:
-                                obs_set = set(obs_ID)
-                                candi_set = set(candi_id)
+                                obs_set = set(obs_ID[[i, j, k, l]])
+                                candi_set = set(star_ctlg.get_ID()[candi_index[0]])
                                 match = obs_set == candi_set
                             if match:
                                 break
@@ -212,8 +216,10 @@ def main():
                 if match:
                     break
         ### Log ###
-        logger.append([sim_seeds, N_obs, N_candi, match])
-
+        logger.append([sim_seed, N_obs, N_candi, int(match)])
+    #
+    fname = f'stats_FOV{FOV_deg}_obsMv{obsMv}_alpha{cover_alpha}'
+    logger.save(fname)
 
 def equatorial2vec(alpha, delta):
     rets = np.empty((len(alpha), 3))
