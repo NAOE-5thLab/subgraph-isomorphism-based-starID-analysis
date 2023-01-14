@@ -47,9 +47,9 @@ class IndexSearch:
         return interval_index
 
     def save_vector(self, dir, fname):
-        df = pd.DataFrame(
-            [self.y_vector, self.i_vector, self.s_vector],
-            columns=['y', 'i', 's'])
+        df = pd.DataFrame(self.y_vector, columns=['y'])
+        df['i'] = self.i_vector
+        df['s'] = self.s_vector
         fname = check_fname(fname, extension='.csv')
         df.to_csv(dir + fname)
 

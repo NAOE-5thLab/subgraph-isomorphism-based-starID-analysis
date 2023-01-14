@@ -31,8 +31,7 @@ class InterAngleCatalog:
                 'star index 1', 'star index 2']].to_numpy()
             #
             index_search = IndexSearch()
-            index_search.load_vector(
-                f'{self.log_dir}/angle_catalog_search_index.csv')
+            index_search.load_vector(self.log_dir, 'angle_catalog_search_index.csv')
         else:
             # Arbitrary pairs
             pair_index = np.array(
@@ -44,19 +43,23 @@ class InterAngleCatalog:
             filter_FOV = inter_angles < FOV
             angles_filtered = inter_angles[filter_FOV]
             pair_index_filtered = pair_index[filter_FOV]
-            angle_df = pd.DataFrame(
-                [angles_filtered, pair_index_filtered[:, 0],
-                    pair_index_filtered[:, 1]],
-                columns=['angle', 'star index 1', 'star index 2'])
+            angle_df = pd.DataFrame(angles_filtered, columns=['angle'])
+            angle_df['star index 1'] = pair_index_filtered[:, 0]
+            angle_df['star index 2'] = pair_index_filtered[:, 1]
             angle_df.to_csv(f'{self.log_dir}/angle_catalog.csv')
             #
             index_search = IndexSearch(y_vector=angles_filtered)
-            index_search.save_vector(
-                f'{self.log_dir}/angle_catalog_search_index.csv')
+            index_search.save_vector(self.log_dir, 'angle_catalog_search_index.csv')
         #
         self.angles_filtered = angles_filtered
         self.pair_index_filtered = pair_index_filtered
         self.index_search = index_search
+
+    def get_pair_index(self):
+        return self.pair_index_filtered
+
+    def get_inter_angles(self):
+        return self.angles_filtered
 
     def get_interval_index(self, y_lower_bound, y_upper_bound):
         interval_index = self.index_search.get_interval_index(

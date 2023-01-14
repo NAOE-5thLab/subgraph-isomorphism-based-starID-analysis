@@ -21,6 +21,24 @@ def uniform_spherical_vector(n=1, seed=100):
     return b
 
 
+def limit_uniform_spherical_vector(sigma=10*np.pi/180, n=1, seed=100):
+    seeds = gen_seeds(seed, 2)
+    np.random.seed(seed=seeds[0])
+    u = np.random.rand(n)
+    np.random.seed(seed=seeds[1])
+    v = np.random.rand(n)
+    #
+    z = 1 - (1 - np.cos(sigma))*u
+    x = np.sqrt(1-z**2)*np.cos(2*np.pi*v)
+    y = np.sqrt(1-z**2)*np.sin(2*np.pi*v)
+    b = np.concatenate(
+        [x[:, np.newaxis], y[:, np.newaxis], z[:, np.newaxis]],
+        axis=1)
+    if n == 1:
+        b = b[0]
+    return b
+
+
 def normal_spherical_approximated_vector(mu, sigma, n=1, seed=100):
     eps = 1.0e-8
     if np.linalg.norm(mu) - 1.0 > eps:
@@ -55,17 +73,17 @@ class VonMisesFisherDistribution:
         self.kappa = kappa
         self.inv_kappa = 1/self.kappa
         self.exp_m2kappa = np.exp(-2 * self.kappa)
-        # 
+        #
         inv_norm = 1/np.linalg.norm(self.mu)
         mx = self.mu[0]*inv_norm
         my = self.mu[1]*inv_norm
         mz = self.mu[2]*inv_norm
-        # 
+        #
         angle = np.arccos(mz)
         c = np.cos(angle * 0.5)
         s = np.sin(angle * 0.5)
         norm = np.sqrt(mx * mx + my * my)
-        # 
+        #
         if norm > 0:
             qr = c
             qi = s * -my / norm
@@ -75,28 +93,28 @@ class VonMisesFisherDistribution:
             qi = 0
             qj = 0
         self.qri = qr * qi
-        self.qij = qi * qj 
+        self.qij = qi * qj
         self.qrj = qr * qj
         self.qxx = qr * qr + qi * qi - qj * qj
         self.qyy = qr * qr - qi * qi + qj * qj
         self.qzz = qr * qr - qi * qi - qj * qj
-                        
+
     def sampling(self, n=1, seed=100):
         seeds = gen_seeds(seed, 2)
         np.random.seed(seed=seeds[0])
         r = np.random.rand(n)
         if self.kappa > 0:
-            w = 1 + np.log(r + (1 - r) * self.exp_m2kappa) * self.inv_kappa 
+            w = 1 + np.log(r + (1 - r) * self.exp_m2kappa) * self.inv_kappa
         else:
             w = 2 * r - 1
         s = np.sqrt(1 - w * w)
         np.random.seed(seed=seeds[1])
         theta = 2 * np.pi * np.random.rand(n)
-        # 
+        #
         x = s * np.cos(theta)
         y = s * np.sin(theta)
         z = w
-        # 
+        #
         xx = x * self.qxx + 2 * (y * self.qij + z * self.qrj)
         yy = y * self.qyy - 2 * (z * self.qri - x * self.qij)
         zz = z * self.qzz - 2 * (x * self.qrj - y * self.qri)
@@ -129,5 +147,3 @@ def von_mises_fisher_cum_dist_func(theta, kappa):
     numerator = np.exp(-2*kappa) - np.exp(kappa * (np.cos(theta) - 1.0))
     denominator = 1 - np.exp(-2*kappa)
     return 1 + numerator/denominator
-
-

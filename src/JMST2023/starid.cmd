@@ -1,0 +1,12 @@
+start python starNinFOV.py --FOV 20 --Mv 5.5
+start python starNinFOV.py --FOV 40 --Mv 5.5
+start python starNinFOV.py --FOV 60 --Mv 5.5
+start python starNinFOV.py --FOV 80 --Mv 5.5
+start python starNinFOV.py --FOV 20 --Mv 4.5
+start python starNinFOV.py --FOV 40 --Mv 4.5
+start python starNinFOV.py --FOV 60 --Mv 4.5
+start python starNinFOV.py --FOV 80 --Mv 4.5
+start python starNinFOV.py --FOV 20 --Mv 3.5
+start python starNinFOV.py --FOV 40 --Mv 3.5
+start python starNinFOV.py --FOV 60 --Mv 3.5
+start python starNinFOV.py --FOV 80 --Mv 3.5
