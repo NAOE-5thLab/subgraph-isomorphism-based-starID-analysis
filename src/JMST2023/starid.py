@@ -26,66 +26,66 @@ parser.add_argument(
 args = parser.parse_args()
 
 patterns = [
-    {'FOV_deg': 20, 'obsMv': 5.5, 'alpha': 0.0},
-    {'FOV_deg': 40, 'obsMv': 5.5, 'alpha': 0.0},
-    {'FOV_deg': 60, 'obsMv': 5.5, 'alpha': 0.0},
-    {'FOV_deg': 80, 'obsMv': 5.5, 'alpha': 0.0},
-    {'FOV_deg': 20, 'obsMv': 4.5, 'alpha': 0.0},
-    {'FOV_deg': 40, 'obsMv': 4.5, 'alpha': 0.0},
-    {'FOV_deg': 60, 'obsMv': 4.5, 'alpha': 0.0},
-    {'FOV_deg': 80, 'obsMv': 4.5, 'alpha': 0.0},
-    {'FOV_deg': 20, 'obsMv': 3.5, 'alpha': 0.0},
-    {'FOV_deg': 40, 'obsMv': 3.5, 'alpha': 0.0},
-    {'FOV_deg': 60, 'obsMv': 3.5, 'alpha': 0.0},
-    {'FOV_deg': 80, 'obsMv': 3.5, 'alpha': 0.0},
-    {'FOV_deg': 20, 'obsMv': 5.5, 'alpha': 0.2},
-    {'FOV_deg': 40, 'obsMv': 5.5, 'alpha': 0.2},
-    {'FOV_deg': 60, 'obsMv': 5.5, 'alpha': 0.2},
-    {'FOV_deg': 80, 'obsMv': 5.5, 'alpha': 0.2},
-    {'FOV_deg': 20, 'obsMv': 4.5, 'alpha': 0.2},
-    {'FOV_deg': 40, 'obsMv': 4.5, 'alpha': 0.2},
-    {'FOV_deg': 60, 'obsMv': 4.5, 'alpha': 0.2},
-    {'FOV_deg': 80, 'obsMv': 4.5, 'alpha': 0.2},
-    {'FOV_deg': 20, 'obsMv': 3.5, 'alpha': 0.2},
-    {'FOV_deg': 40, 'obsMv': 3.5, 'alpha': 0.2},
-    {'FOV_deg': 60, 'obsMv': 3.5, 'alpha': 0.2},
-    {'FOV_deg': 80, 'obsMv': 3.5, 'alpha': 0.2},
-    {'FOV_deg': 20, 'obsMv': 5.5, 'alpha': 0.4},
-    {'FOV_deg': 40, 'obsMv': 5.5, 'alpha': 0.4},
-    {'FOV_deg': 60, 'obsMv': 5.5, 'alpha': 0.4},
-    {'FOV_deg': 80, 'obsMv': 5.5, 'alpha': 0.4},
-    {'FOV_deg': 20, 'obsMv': 4.5, 'alpha': 0.4},
-    {'FOV_deg': 40, 'obsMv': 4.5, 'alpha': 0.4},
-    {'FOV_deg': 60, 'obsMv': 4.5, 'alpha': 0.4},
-    {'FOV_deg': 80, 'obsMv': 4.5, 'alpha': 0.4},
-    {'FOV_deg': 20, 'obsMv': 3.5, 'alpha': 0.4},
-    {'FOV_deg': 40, 'obsMv': 3.5, 'alpha': 0.4},
-    {'FOV_deg': 60, 'obsMv': 3.5, 'alpha': 0.4},
-    {'FOV_deg': 80, 'obsMv': 3.5, 'alpha': 0.4},
-    {'FOV_deg': 20, 'obsMv': 5.5, 'alpha': 0.6},
-    {'FOV_deg': 40, 'obsMv': 5.5, 'alpha': 0.6},
-    {'FOV_deg': 60, 'obsMv': 5.5, 'alpha': 0.6},
-    {'FOV_deg': 80, 'obsMv': 5.5, 'alpha': 0.6},
-    {'FOV_deg': 20, 'obsMv': 4.5, 'alpha': 0.6},
-    {'FOV_deg': 40, 'obsMv': 4.5, 'alpha': 0.6},
-    {'FOV_deg': 60, 'obsMv': 4.5, 'alpha': 0.6},
-    {'FOV_deg': 80, 'obsMv': 4.5, 'alpha': 0.6},
-    {'FOV_deg': 20, 'obsMv': 3.5, 'alpha': 0.6},
-    {'FOV_deg': 40, 'obsMv': 3.5, 'alpha': 0.6},
-    {'FOV_deg': 60, 'obsMv': 3.5, 'alpha': 0.6},
-    {'FOV_deg': 80, 'obsMv': 3.5, 'alpha': 0.6},
-    {'FOV_deg': 20, 'obsMv': 5.5, 'alpha': 0.8},
-    {'FOV_deg': 40, 'obsMv': 5.5, 'alpha': 0.8},
-    {'FOV_deg': 60, 'obsMv': 5.5, 'alpha': 0.8},
-    {'FOV_deg': 80, 'obsMv': 5.5, 'alpha': 0.8},
-    {'FOV_deg': 20, 'obsMv': 4.5, 'alpha': 0.8},
-    {'FOV_deg': 40, 'obsMv': 4.5, 'alpha': 0.8},
-    {'FOV_deg': 60, 'obsMv': 4.5, 'alpha': 0.8},
-    {'FOV_deg': 80, 'obsMv': 4.5, 'alpha': 0.8},
-    {'FOV_deg': 20, 'obsMv': 3.5, 'alpha': 0.8},
-    {'FOV_deg': 40, 'obsMv': 3.5, 'alpha': 0.8},
-    {'FOV_deg': 60, 'obsMv': 3.5, 'alpha': 0.8},
-    {'FOV_deg': 80, 'obsMv': 3.5, 'alpha': 0.8},
+    {'FOV_deg': 20, 'obsMv': 5.5, 'beta': 0.0},
+    {'FOV_deg': 40, 'obsMv': 5.5, 'beta': 0.0},
+    {'FOV_deg': 60, 'obsMv': 5.5, 'beta': 0.0},
+    {'FOV_deg': 80, 'obsMv': 5.5, 'beta': 0.0},
+    {'FOV_deg': 20, 'obsMv': 4.5, 'beta': 0.0},
+    {'FOV_deg': 40, 'obsMv': 4.5, 'beta': 0.0},
+    {'FOV_deg': 60, 'obsMv': 4.5, 'beta': 0.0},
+    {'FOV_deg': 80, 'obsMv': 4.5, 'beta': 0.0},
+    {'FOV_deg': 20, 'obsMv': 3.5, 'beta': 0.0},
+    {'FOV_deg': 40, 'obsMv': 3.5, 'beta': 0.0},
+    {'FOV_deg': 60, 'obsMv': 3.5, 'beta': 0.0},
+    {'FOV_deg': 80, 'obsMv': 3.5, 'beta': 0.0},
+    {'FOV_deg': 20, 'obsMv': 5.5, 'beta': 0.2},
+    {'FOV_deg': 40, 'obsMv': 5.5, 'beta': 0.2},
+    {'FOV_deg': 60, 'obsMv': 5.5, 'beta': 0.2},
+    {'FOV_deg': 80, 'obsMv': 5.5, 'beta': 0.2},
+    {'FOV_deg': 20, 'obsMv': 4.5, 'beta': 0.2},
+    {'FOV_deg': 40, 'obsMv': 4.5, 'beta': 0.2},
+    {'FOV_deg': 60, 'obsMv': 4.5, 'beta': 0.2},
+    {'FOV_deg': 80, 'obsMv': 4.5, 'beta': 0.2},
+    {'FOV_deg': 20, 'obsMv': 3.5, 'beta': 0.2},
+    {'FOV_deg': 40, 'obsMv': 3.5, 'beta': 0.2},
+    {'FOV_deg': 60, 'obsMv': 3.5, 'beta': 0.2},
+    {'FOV_deg': 80, 'obsMv': 3.5, 'beta': 0.2},
+    {'FOV_deg': 20, 'obsMv': 5.5, 'beta': 0.4},
+    {'FOV_deg': 40, 'obsMv': 5.5, 'beta': 0.4},
+    {'FOV_deg': 60, 'obsMv': 5.5, 'beta': 0.4},
+    {'FOV_deg': 80, 'obsMv': 5.5, 'beta': 0.4},
+    {'FOV_deg': 20, 'obsMv': 4.5, 'beta': 0.4},
+    {'FOV_deg': 40, 'obsMv': 4.5, 'beta': 0.4},
+    {'FOV_deg': 60, 'obsMv': 4.5, 'beta': 0.4},
+    {'FOV_deg': 80, 'obsMv': 4.5, 'beta': 0.4},
+    {'FOV_deg': 20, 'obsMv': 3.5, 'beta': 0.4},
+    {'FOV_deg': 40, 'obsMv': 3.5, 'beta': 0.4},
+    {'FOV_deg': 60, 'obsMv': 3.5, 'beta': 0.4},
+    {'FOV_deg': 80, 'obsMv': 3.5, 'beta': 0.4},
+    {'FOV_deg': 20, 'obsMv': 5.5, 'beta': 0.6},
+    {'FOV_deg': 40, 'obsMv': 5.5, 'beta': 0.6},
+    {'FOV_deg': 60, 'obsMv': 5.5, 'beta': 0.6},
+    {'FOV_deg': 80, 'obsMv': 5.5, 'beta': 0.6},
+    {'FOV_deg': 20, 'obsMv': 4.5, 'beta': 0.6},
+    {'FOV_deg': 40, 'obsMv': 4.5, 'beta': 0.6},
+    {'FOV_deg': 60, 'obsMv': 4.5, 'beta': 0.6},
+    {'FOV_deg': 80, 'obsMv': 4.5, 'beta': 0.6},
+    {'FOV_deg': 20, 'obsMv': 3.5, 'beta': 0.6},
+    {'FOV_deg': 40, 'obsMv': 3.5, 'beta': 0.6},
+    {'FOV_deg': 60, 'obsMv': 3.5, 'beta': 0.6},
+    {'FOV_deg': 80, 'obsMv': 3.5, 'beta': 0.6},
+    {'FOV_deg': 20, 'obsMv': 5.5, 'beta': 0.8},
+    {'FOV_deg': 40, 'obsMv': 5.5, 'beta': 0.8},
+    {'FOV_deg': 60, 'obsMv': 5.5, 'beta': 0.8},
+    {'FOV_deg': 80, 'obsMv': 5.5, 'beta': 0.8},
+    {'FOV_deg': 20, 'obsMv': 4.5, 'beta': 0.8},
+    {'FOV_deg': 40, 'obsMv': 4.5, 'beta': 0.8},
+    {'FOV_deg': 60, 'obsMv': 4.5, 'beta': 0.8},
+    {'FOV_deg': 80, 'obsMv': 4.5, 'beta': 0.8},
+    {'FOV_deg': 20, 'obsMv': 3.5, 'beta': 0.8},
+    {'FOV_deg': 40, 'obsMv': 3.5, 'beta': 0.8},
+    {'FOV_deg': 60, 'obsMv': 3.5, 'beta': 0.8},
+    {'FOV_deg': 80, 'obsMv': 3.5, 'beta': 0.8},
 ]
 
 ### Parameter ###
@@ -101,7 +101,7 @@ limitMv = 5.5
 FOV_deg = pattern['FOV_deg']
 FOV = deg2rad(FOV_deg)
 obsMv = pattern['obsMv']
-cover_alpha = pattern['alpha']
+cover_beta = pattern['beta']
 
 sigma = np.arctan2(2*np.tan(FOV*0.5), U)
 epsilon = 2*sigma
@@ -153,7 +153,7 @@ def main():
         cond_3 = np.abs(s_vec_R[:, 1]) < temp
         in_FOV = cond_1 * cond_2 * cond_3
         # cover rate
-        notcover = np.random.binomial(size=N_catalog, n=1, p=1-cover_alpha)
+        notcover = np.random.binomial(size=N_catalog, n=1, p=1-cover_beta)
         # select stars
         condition = in_FOV*notcover == 1
         obs_ID = obs_star_ctlg.get_ID()[condition]
@@ -223,7 +223,7 @@ def main():
         ### Log ###
         logger.append([sim_seed, N_obs, N_candi, int(match)])
     #
-    fname = f'stats_FOV{FOV_deg}_obsMv{obsMv}_alpha{cover_alpha}'
+    fname = f'stats_FOV{FOV_deg}_obsMv{obsMv}_beta{cover_beta}'
     logger.save(fname)
 
 def equatorial2vec(alpha, delta):
@@ -307,15 +307,15 @@ def analy_result():
     FIG_SIZE = (4, 2.5)
     # 
     logs = []
-    header = ['FOV_deg', 'obsMv', 'cover_alpha',
+    header = ['FOV_deg', 'obsMv', 'cover_beta',
              'match_prob', 'match_prob_in_2',
              'match_prob_in_3', 'match_prob_in_4']
     for pattern in patterns:
         FOV_deg = pattern['FOV_deg']
         obsMv = pattern['obsMv']
-        cover_alpha = pattern['alpha']
+        cover_beta = pattern['beta']
         # load
-        fname = f'stats_FOV{FOV_deg}_obsMv{obsMv}_alpha{cover_alpha}.csv'
+        fname = f'stats_FOV{FOV_deg}_obsMv{obsMv}_beta{cover_beta}.csv'
         df = pd.read_csv(log_dir+fname)
         # matching prob
         match_prob = df['match'].mean()
@@ -323,7 +323,7 @@ def analy_result():
         match_prob_in_3 = df[df['N_obs']==3]['match'].mean()
         match_prob_in_4 = df[df['N_obs']>3]['match'].mean()
         logs.append(
-            [FOV_deg, obsMv, cover_alpha,
+            [FOV_deg, obsMv, cover_beta,
              match_prob, match_prob_in_2,
              match_prob_in_3, match_prob_in_4])
         # obs prob
@@ -334,8 +334,8 @@ def analy_result():
         ax.plot(bins[:-1], pm, color='black')
         ax.set_ylabel('Probability mass')
         ax.set_xlabel('The number of stars in FOV')
-        ax.set_title(f'Observe probability (FOV:{FOV_deg}, obsMv:{obsMv}, alpha:{cover_alpha})')
-        fig.savefig(f"{log_dir}/inFOV_from_stats_FOV{FOV_deg}_obsMv{obsMv}_alpha{cover_alpha}.pdf")
+        ax.set_title(f'Observe probability (FOV:{FOV_deg}, obsMv:{obsMv}, beta:{cover_beta})')
+        fig.savefig(f"{log_dir}/inFOV_from_stats_FOV{FOV_deg}_obsMv{obsMv}_beta{cover_beta}.pdf")
     df = pd.DataFrame(logs, columns=header)
     df.to_csv(log_dir+'stats_analy_result.csv')
 
