@@ -301,6 +301,47 @@ class Logger:
         plt.pause(0.01)
 
 
+def analy_result():
+    font_setting()
+    DPI = 100
+    FIG_SIZE = (4, 2.5)
+    # 
+    logs = []
+    header = ['FOV_deg', 'obsMv', 'cover_alpha',
+             'match_prob', 'match_prob_in_2',
+             'match_prob_in_3', 'match_prob_in_4']
+    for pattern in patterns:
+        FOV_deg = pattern['FOV_deg']
+        obsMv = pattern['obsMv']
+        cover_alpha = pattern['alpha']
+        # load
+        fname = f'stats_FOV{FOV_deg}_obsMv{obsMv}_alpha{cover_alpha}.csv'
+        df = pd.read_csv(log_dir+fname)
+        # matching prob
+        match_prob = df['match'].mean()
+        match_prob_in_2 = df[df['N_obs']==2]['match'].mean()
+        match_prob_in_3 = df[df['N_obs']==3]['match'].mean()
+        match_prob_in_4 = df[df['N_obs']>3]['match'].mean()
+        logs.append(
+            [FOV_deg, obsMv, cover_alpha,
+             match_prob, match_prob_in_2,
+             match_prob_in_3, match_prob_in_4])
+        # obs prob
+        fig = plt.figure(figsize=FIG_SIZE, dpi=DPI)
+        ax = fig.add_subplot(111)
+        pm, bins = np.histogram(
+            df['N_obs'], bins=range(0, np.max(df['N_obs'])+1), density=True)
+        ax.plot(bins[:-1], pm, color='black')
+        ax.set_ylabel('Probability mass')
+        ax.set_xlabel('The number of stars in FOV')
+        ax.set_title(f'Observe probability (FOV:{FOV_deg}, obsMv:{obsMv}, alpha:{cover_alpha})')
+        fig.savefig(f"{log_dir}/inFOV_from_stats_FOV{FOV_deg}_obsMv{obsMv}_alpha{cover_alpha}.pdf")
+    df = pd.DataFrame(logs, columns=header)
+    df.to_csv(log_dir+'stats_analy_result.csv')
+
+
+
 if __name__ == '__main__':
     main()
+    # analy_result()
     print('Task complete')

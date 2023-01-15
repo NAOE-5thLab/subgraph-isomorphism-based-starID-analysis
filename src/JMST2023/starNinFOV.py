@@ -1,3 +1,4 @@
+import os
 from line_profiler import LineProfiler
 import argparse
 
@@ -13,48 +14,135 @@ from database import YaleStarCatalog, StarCatalog
 from utils.unit_convert import deg2rad
 from utils.font import font_setting
 
-
 parser = argparse.ArgumentParser()
 parser.add_argument(
-    "--FOV",
+    "--i",
     type=int,
-    default=20,
+    default=0,
     help="degree")
-parser.add_argument(
-    "--Mv",
-    type=float,
-    default=5.5,
-    help="visual magnitude")
 args = parser.parse_args()
+
+patterns = [
+    {'FOV_deg': 20, 'obsMv': 5.5, 'alpha': 0.0},
+    {'FOV_deg': 40, 'obsMv': 5.5, 'alpha': 0.0},
+    {'FOV_deg': 60, 'obsMv': 5.5, 'alpha': 0.0},
+    {'FOV_deg': 80, 'obsMv': 5.5, 'alpha': 0.0},
+    {'FOV_deg': 20, 'obsMv': 4.5, 'alpha': 0.0},
+    {'FOV_deg': 40, 'obsMv': 4.5, 'alpha': 0.0},
+    {'FOV_deg': 60, 'obsMv': 4.5, 'alpha': 0.0},
+    {'FOV_deg': 80, 'obsMv': 4.5, 'alpha': 0.0},
+    {'FOV_deg': 20, 'obsMv': 3.5, 'alpha': 0.0},
+    {'FOV_deg': 40, 'obsMv': 3.5, 'alpha': 0.0},
+    {'FOV_deg': 60, 'obsMv': 3.5, 'alpha': 0.0},
+    {'FOV_deg': 80, 'obsMv': 3.5, 'alpha': 0.0},
+    {'FOV_deg': 20, 'obsMv': 5.5, 'alpha': 0.2},
+    {'FOV_deg': 40, 'obsMv': 5.5, 'alpha': 0.2},
+    {'FOV_deg': 60, 'obsMv': 5.5, 'alpha': 0.2},
+    {'FOV_deg': 80, 'obsMv': 5.5, 'alpha': 0.2},
+    {'FOV_deg': 20, 'obsMv': 4.5, 'alpha': 0.2},
+    {'FOV_deg': 40, 'obsMv': 4.5, 'alpha': 0.2},
+    {'FOV_deg': 60, 'obsMv': 4.5, 'alpha': 0.2},
+    {'FOV_deg': 80, 'obsMv': 4.5, 'alpha': 0.2},
+    {'FOV_deg': 20, 'obsMv': 3.5, 'alpha': 0.2},
+    {'FOV_deg': 40, 'obsMv': 3.5, 'alpha': 0.2},
+    {'FOV_deg': 60, 'obsMv': 3.5, 'alpha': 0.2},
+    {'FOV_deg': 80, 'obsMv': 3.5, 'alpha': 0.2},
+    {'FOV_deg': 20, 'obsMv': 5.5, 'alpha': 0.4},
+    {'FOV_deg': 40, 'obsMv': 5.5, 'alpha': 0.4},
+    {'FOV_deg': 60, 'obsMv': 5.5, 'alpha': 0.4},
+    {'FOV_deg': 80, 'obsMv': 5.5, 'alpha': 0.4},
+    {'FOV_deg': 20, 'obsMv': 4.5, 'alpha': 0.4},
+    {'FOV_deg': 40, 'obsMv': 4.5, 'alpha': 0.4},
+    {'FOV_deg': 60, 'obsMv': 4.5, 'alpha': 0.4},
+    {'FOV_deg': 80, 'obsMv': 4.5, 'alpha': 0.4},
+    {'FOV_deg': 20, 'obsMv': 3.5, 'alpha': 0.4},
+    {'FOV_deg': 40, 'obsMv': 3.5, 'alpha': 0.4},
+    {'FOV_deg': 60, 'obsMv': 3.5, 'alpha': 0.4},
+    {'FOV_deg': 80, 'obsMv': 3.5, 'alpha': 0.4},
+    {'FOV_deg': 20, 'obsMv': 5.5, 'alpha': 0.6},
+    {'FOV_deg': 40, 'obsMv': 5.5, 'alpha': 0.6},
+    {'FOV_deg': 60, 'obsMv': 5.5, 'alpha': 0.6},
+    {'FOV_deg': 80, 'obsMv': 5.5, 'alpha': 0.6},
+    {'FOV_deg': 20, 'obsMv': 4.5, 'alpha': 0.6},
+    {'FOV_deg': 40, 'obsMv': 4.5, 'alpha': 0.6},
+    {'FOV_deg': 60, 'obsMv': 4.5, 'alpha': 0.6},
+    {'FOV_deg': 80, 'obsMv': 4.5, 'alpha': 0.6},
+    {'FOV_deg': 20, 'obsMv': 3.5, 'alpha': 0.6},
+    {'FOV_deg': 40, 'obsMv': 3.5, 'alpha': 0.6},
+    {'FOV_deg': 60, 'obsMv': 3.5, 'alpha': 0.6},
+    {'FOV_deg': 80, 'obsMv': 3.5, 'alpha': 0.6},
+    {'FOV_deg': 20, 'obsMv': 5.5, 'alpha': 0.8},
+    {'FOV_deg': 40, 'obsMv': 5.5, 'alpha': 0.8},
+    {'FOV_deg': 60, 'obsMv': 5.5, 'alpha': 0.8},
+    {'FOV_deg': 80, 'obsMv': 5.5, 'alpha': 0.8},
+    {'FOV_deg': 20, 'obsMv': 4.5, 'alpha': 0.8},
+    {'FOV_deg': 40, 'obsMv': 4.5, 'alpha': 0.8},
+    {'FOV_deg': 60, 'obsMv': 4.5, 'alpha': 0.8},
+    {'FOV_deg': 80, 'obsMv': 4.5, 'alpha': 0.8},
+    {'FOV_deg': 20, 'obsMv': 3.5, 'alpha': 0.8},
+    {'FOV_deg': 40, 'obsMv': 3.5, 'alpha': 0.8},
+    {'FOV_deg': 60, 'obsMv': 3.5, 'alpha': 0.8},
+    {'FOV_deg': 80, 'obsMv': 3.5, 'alpha': 0.8},
+]
 
 ### Parameter ###
 # sys
 log_dir = './log/'
+pattern = patterns[args.i]
 # config
-master_seed = 10
-FOV_deg = args.FOV
-FOV = deg2rad(FOV_deg)
+seed = 100
 roopN = int(1e5)
 calcN = int(1e4)
-# catalog
-Mv_max = 5.5
-Mv_obs = args.Mv
-multi_angle = 1.0e-5
+U = 4096
+limitMv = 5.5
+
+FOV_deg = pattern['FOV_deg']
+FOV = deg2rad(FOV_deg)
+obsMv = pattern['obsMv']
+cover_alpha = pattern['alpha']
+
+sigma = np.arctan2(2*np.tan(FOV*0.5), U)
+epsilon = 2*sigma
+theta_max = 2*np.arctan2(np.sqrt(2)*np.tan(FOV*0.5), 1)
 
 
-def main():
-    sim()
-    # hist_csv()
-    # plot_prob_alpha(0.2)
-    # plot_prob_alpha(0.4)
-    # plot_prob_alpha(0.6)
-    # plot_prob_alpha(0.8)
-    # plot_starnum_prob(10)
-    # plot_all()
-    # prob_n(n=4)
-    # prob_n(n=10)
-    # plot_prob(n=4)
-    # plot_prob(n=10)
+def simulation():
+    # check file
+    path = f'{log_dir}/inFOV_{FOV_deg}_{obsMv}.dat'
+    if os.path.isfile(path):
+        print(f'{path} exist!')
+        return 0
+    
+    ### Catalog setup ###
+    yale = YaleStarCatalog(log_dir=log_dir)
+    # 
+    obs_star_ctlg = StarCatalog(yale.get_HR(), yale.get_RA(), yale.get_DE())
+    obs_star_ctlg.filtering_by_visual_magnitude(yale.get_Vmag(), limitMv)
+    obs_star_ctlg.filtering_by_multiple_stars(epsilon)
+    obs_star_ctlg.filtering_by_visual_magnitude(yale.get_Vmag(), obsMv)
+    s_vec = equatorial2vec(obs_star_ctlg.get_RA(), obs_star_ctlg.get_DE())
+
+    ### Monte Carlo ###
+    tan_FOV2 = np.tan(FOV/2.0)
+    # loop
+    log_file = open(path, 'w')
+    for round in tqdm.tqdm(range(roopN)):
+        # sampling
+        np.random.seed(seed=round+seed)
+        R = special_ortho_group.rvs(dim=3, size=calcN)
+        eq_vec_R = rotate(R, s_vec)
+        # FOV condition
+        cond_1 = eq_vec_R[:, :, 2] > 0.0
+        temp = tan_FOV2*eq_vec_R[:, :, 2]
+        cond_2 = np.abs(eq_vec_R[:, :, 0]) < temp
+        cond_3 = np.abs(eq_vec_R[:, :, 1]) < temp
+        in_FOV = cond_1 * cond_2 * cond_3
+        in_FOV_n = np.sum(in_FOV, axis=1)
+        # save
+        for j in range(calcN):
+            log_file.write(f'{in_FOV_n[j]}\n')
+    log_file.close()
+    return 0
 
 
 @jit(nopython=True)
@@ -74,192 +162,59 @@ def rotate(R, vec):
     return ret
 
 
-def sim():
-    ### Catalog setup ###
-    yale = YaleStarCatalog(log_dir=log_dir)
+def analy_result():
+    font_setting()
+    DPI = 100
+    FIG_SIZE = (4, 2.5)
     # 
-    obs_star_ctlg = StarCatalog(yale.get_HR(), yale.get_RA(), yale.get_DE())
-    obs_star_ctlg.filtering_by_visual_magnitude(yale.get_Vmag(), Mv_max)
-    obs_star_ctlg.filtering_by_multiple_stars(multi_angle)    
-    obs_star_ctlg.filtering_by_visual_magnitude(yale.get_Vmag(), Mv_obs)
-    eq_vec = equatorial2vec(obs_star_ctlg.get_RA(), obs_star_ctlg.get_DE())
+    max_n = 1000
+    true_max_n = 0
+    counter = 0
+    n_counter = np.zeros(max_n)
+    path = f'{log_dir}/inFOV_{FOV_deg}_{obsMv}.dat'
+    for line in line_gene(path):
+        n = int(line)
+        counter += 1
+        n_counter[n] += 1
+        if true_max_n < n:
+            true_max_n = n
+    # 
+    pNs = n_counter/counter
+    pns = np.zeros(max_n)
+    for n in range(max_n):
+        for N in range(max_n):
+            if pNs[N] > 0.0:
+                pn_N = binom.pmf(n, N, 1-cover_alpha)
+                pns[n] += pNs[N] * pn_N
+            else:
+                pns[n] += 0.0
+    print(pns.sum(), pNs.sum())
+    # save
+    df = pd.DataFrame(range(true_max_n+1), pNs[:true_max_n+1], columns=['n', 'prob'])
+    df.to_csv(f'{log_dir}/inFOV_prob_FOV{FOV_deg}_obsMv{obsMv}.csv')
+    df = pd.DataFrame(range(true_max_n+1), pns[:true_max_n+1], columns=['n', 'prob'])
+    df.to_csv(f'{log_dir}/inFOV_prob_FOV{FOV_deg}_obsMv{obsMv}_alpha{cover_alpha}.csv')
+    # plot 
+    fig = plt.figure(figsize=FIG_SIZE, dpi=DPI)
+    ax = fig.add_subplot(111)
+    ax.plot(
+        range(true_max_n+1), pNs[:true_max_n+1],
+        color='black',
+        label='$P(N^{\prime}_{\mathrm{obs}} \mid M_v, \\theta_{\mathrm{FOV}})$')
+    ax.plot(
+        range(true_max_n+1), pns[:true_max_n+1],
+        color='black',
+        label='$P(N_{\mathrm{obs}} \mid M_v, \\theta_{\mathrm{FOV}}), \\beta$')
+    ax.set_ylabel('Probability mass')
+    ax.set_xlabel('The number of stars in FOV')
+    fig.savefig(f"{log_dir}/inFOV_FOV{FOV_deg}_obsMv{obsMv}_alpha{cover_alpha}.pdf")
 
-    ### Monte Carlo ###
-    tan_FOV2 = np.tan(FOV/2.0)
-    # loop
-    log_file = open(f'{log_dir}/inFOV_{FOV_deg}_{Mv_obs}.dat', 'w')
-    for i in tqdm.tqdm(range(roopN)):
-        # sampling
-        np.random.seed(seed=i+master_seed)
-        R = special_ortho_group.rvs(dim=3, size=calcN)
-        eq_vec_R = rotate(R, eq_vec)
-        # FOV condition
-        cond_1 = eq_vec_R[:, :, 2] > 0.0
-        temp = tan_FOV2*eq_vec_R[:, :, 2]
-        cond_2 = np.abs(eq_vec_R[:, :, 0]) < temp
-        cond_3 = np.abs(eq_vec_R[:, :, 1]) < temp
-        in_FOV = cond_1 * cond_2 * cond_3
-        in_FOV_n = np.sum(in_FOV, axis=1)
-        # save
-        for j in range(calcN):
-            log_file.write(f'{in_FOV_n[j]}\n')
-    log_file.close()
 
-
-def hist_csv():
-    def line_gene(path):
+def line_gene(path):
         with open(path, 'r') as f:
             for line in f:
                 yield line
-    width_list = [60, 180, 630]
-    #
-    for i, Mv_obs in enumerate([3.5, 4.5, 5.5]):
-        for j, FOV_deg in enumerate([20, 40, 60, 80]):
-            print(f'FOV : {FOV_deg}, Mv : {Mv_obs}')
-            progress = 0
-            counter = np.zeros(width_list[i]+1)
-            for line in line_gene(f'{log_dir}/inFOV_{FOV_deg}_{Mv_obs}.dat'):
-                num = int(line)
-                counter[num] += 1
-                progress += 1
-                if progress % 1e8==0:
-                    print(f'progress : {progress}')
-            with open(f"{log_dir}/inFOV_{FOV_deg}_{Mv_obs}_dens.dat", mode='w') as f:
-                for k in range(width_list[i]+1):
-                    f.write(f'{k},{counter[k]}\n')
-
-
-def plot_all():
-    font_setting()
-    DPI = 100
-    FIG_SIZE = (4, 2.5)
-    #
-    width_list = [60, 180, 630]
-    ls_list = ["solid", "dashed", "dashdot", "dotted"]
-    color_list = ['black', 'b', 'r', 'g']
-    #
-    for i, Mv_obs in enumerate([3.5, 4.5, 5.5]):
-        fig = plt.figure(figsize=FIG_SIZE, dpi=DPI)
-        ax = fig.add_subplot(111)
-        for j, FOV_deg in enumerate([20, 40, 60, 80]):
-            print(f'FOV : {FOV_deg}, Mv : {Mv_obs}')
-            print(f'loading data ...')
-            log_file = open(f'{log_dir}/inFOV_{FOV_deg}_{Mv_obs}.dat', 'r')
-            num_list = log_file.readlines()
-            num_list = [int(num) for num in num_list]
-            log_file.close()
-            #
-            print(f'calc hist ...')
-            pd, bins = np.histogram(num_list, bins=range(
-                0, width_list[i]+1), density=True)
-            print(f'ploting ...')
-            ax.plot(
-                bins[:-1], pd,
-                color=color_list[j],
-                linestyle=ls_list[j],
-                label=f'FOV = {FOV_deg} [deg.]',
-            )
-        ax.set_ylabel('Probability')
-        ax.set_xlabel('The number of stars in FOV')
-        ax.legend()
-        fig.savefig(f"{log_dir}/inFOV_Mv{Mv_obs}_dens.pdf")
-
-
-def prob_n(n=10):
-    for i, Mv_obs in enumerate([3.5, 4.5, 5.5]):
-        for j, FOV_deg in enumerate([20, 40, 60, 80]):
-            print(f'FOV : {FOV_deg}, Mv : {Mv_obs}')
-            print(f'loading data ...')
-            load_file = open(f'{log_dir}/inFOV_{FOV_deg}_{Mv_obs}.dat', 'r')
-            num_list = load_file.readlines()
-            nums = np.array([int(num) for num in num_list])
-            load_file.close()
-            #
-            log_file = open(f'{log_dir}/inFOV_{FOV_deg}_{Mv_obs}_prob_{n}.dat', 'w')
-            for alpha in range(0, 1+0.05, 0.05):
-                freq = np.sum(nums < n/alpha)
-                prob = freq/len(nums)
-                log_file.write(f'{alpha},{prob}\n')
-            log_file.close()
-
-
-def plot_prob(n=10):
-    font_setting()
-    DPI = 100
-    FIG_SIZE = (4, 2.5)
-    # 
-    fig = plt.figure(figsize=FIG_SIZE, dpi=DPI)
-    ax = fig.add_subplot(111)
-    for i, Mv_obs in enumerate([3.5, 4.5, 5.5]):
-        for j, FOV_deg in enumerate([20, 40, 60, 80]):
-            print(f'FOV : {FOV_deg}, Mv : {Mv_obs}')
-            print(f'loading data ...')
-            load_file = open(f'{log_dir}/inFOV_{FOV_deg}_{Mv_obs}_prob_{n}.dat', 'r')
-            alphas = []
-            probs = []
-            for line in load_file.readlines():
-                alphas.append(float(line.split(',')[0]))
-                probs.append(float(line.split(',')[1]))
-            load_file.close()
-            ax.plot(alphas, probs)
-    ax.set_xlim(0, 1)
-    ax.set_ylim(0, 1)
-    ax.set_xlabel('Alpha')
-    ax.set_xlabel('Probability')
-    
-    
-def plot_prob_alpha(alpha):
-    font_setting()
-    DPI = 100
-    FIG_SIZE = (4, 2.5)
-    width_list = [60, 180, 630]
-    ls_list = ["solid", "dashed", "dashdot", "dotted"]
-    color_list = ['black', 'b', 'r', 'g']
-    for i, Mv_obs in enumerate([3.5, 4.5, 5.5]):
-        fig = plt.figure(figsize=FIG_SIZE, dpi=DPI)
-        ax = fig.add_subplot(111)
-        for j, FOV_deg in enumerate([20, 40, 60, 80]):
-            with open(f"{log_dir}/inFOV_{FOV_deg}_{Mv_obs}_dens.dat", mode='r') as f:
-                lines = f.readlines()
-            pNs = np.zeros(len(lines))
-            count_all = 0
-            for line in lines:
-                N, count = line.split(',')
-                pNs[int(N)] = int(count[:-3])
-                count_all += int(count[:-3])
-            pNs = pNs/count_all
-            # 
-            pns = np.zeros(len(lines))
-            for n in range(len(lines)):
-                for N in range(len(lines)):
-                    # alpha_prob = alpha**(N-n)*(1-alpha)**n
-                    # pn_N = comb(N, n, exact=True)*alpha_prob
-                    pn_N = binom.pmf(n, N, 1-alpha)
-                    pns[n] += pNs[N] * pn_N
-            # 
-            print(pns.sum(), pNs.sum())
-            #
-            ax.plot(
-                range(len(pns)), pns,
-                color=color_list[j],
-                linestyle=ls_list[j],
-                label=f'FOV = {FOV_deg} [deg.]',
-            )
-        # 
-        cum_p = 0
-        for k, pn in enumerate(pns):
-            cum_p += pn
-            if 1.0 - cum_p < 1.0e-8:
-                if pn == 0.0:
-                    print(f'end : {k}')
-                    ax.set_xlim(0, k+1)
-                    break
-        # 
-        ax.set_ylabel('Probability')
-        ax.set_xlabel('The number of stars in FOV')
-        ax.legend()
-        fig.savefig(f"{log_dir}/inFOV_{FOV_deg}_{Mv_obs}_{alpha}_dens.pdf")
-        
+                 
 
 def plot_starnum_prob(star_num):
     font_setting()
@@ -270,35 +225,35 @@ def plot_starnum_prob(star_num):
     span = 0.05
     alphas = np.arange(0, 1+span, span)
     # 
-    # df = pd.DataFrame(alphas, columns=['alpha'])
-    # for i, Mv_obs in enumerate([3.5, 4.5, 5.5]):
-    #     for j, FOV_deg in enumerate([20, 40, 60, 80]):
-    #         print(f'Magnitude Limit = {Mv_obs} [Mv], FOV = {FOV_deg} [deg.]')
-    #         with open(f"{log_dir}/inFOV_{FOV_deg}_{Mv_obs}_dens.dat", mode='r') as f:
-    #             lines = f.readlines()
-    #         pNs = np.zeros(len(lines))
-    #         count_all = 0
-    #         for line in lines:
-    #             N, count = line.split(',')
-    #             pNs[int(N)] = int(count[:-3])
-    #             count_all += int(count[:-3])
-    #         pNs = pNs/count_all
-    #         # 
-    #         probs = []
-    #         for alpha in alphas:
-    #             pns = np.zeros(len(lines))
-    #             for n in range(len(lines)):
-    #                 for N in range(len(lines)):
-    #                     pn_N = binom.pmf(n, N, 1-alpha)
-    #                     pns[n] += pNs[N] * pn_N
-    #             # 
-    #             prob = 0
-    #             for n in range(star_num+1):
-    #                 prob += pns[n]
-    #             probs.append(prob)
-    #         # 
-    #         df[f'Mv{Mv_obs}_FOV{FOV_deg}'] = probs
-    # df.to_csv(f"{log_dir}/inFOV_starnum_prob_{star_num}.csv")
+    df = pd.DataFrame(alphas, columns=['alpha'])
+    for i, Mv_obs in enumerate([3.5, 4.5, 5.5]):
+        for j, FOV_deg in enumerate([20, 40, 60, 80]):
+            print(f'Magnitude Limit = {Mv_obs} [Mv], FOV = {FOV_deg} [deg.]')
+            with open(f"{log_dir}/inFOV_{FOV_deg}_{Mv_obs}_dens.dat", mode='r') as f:
+                lines = f.readlines()
+            pNs = np.zeros(len(lines))
+            count_all = 0
+            for line in lines:
+                N, count = line.split(',')
+                pNs[int(N)] = int(count[:-3])
+                count_all += int(count[:-3])
+            pNs = pNs/count_all
+            # 
+            probs = []
+            for alpha in alphas:
+                pns = np.zeros(len(lines))
+                for n in range(len(lines)):
+                    for N in range(len(lines)):
+                        pn_N = binom.pmf(n, N, 1-alpha)
+                        pns[n] += pNs[N] * pn_N
+                # 
+                prob = 0
+                for n in range(star_num+1):
+                    prob += pns[n]
+                probs.append(prob)
+            # 
+            df[f'Mv{Mv_obs}_FOV{FOV_deg}'] = probs
+    df.to_csv(f"{log_dir}/inFOV_starnum_prob_{star_num}.csv")
     # 
     df = pd.read_csv(f"{log_dir}/inFOV_starnum_prob_{star_num}.csv")
     fig = plt.figure(figsize=FIG_SIZE, dpi=DPI)
@@ -317,6 +272,12 @@ def plot_starnum_prob(star_num):
     fig.tight_layout()
     fig.savefig(f"{log_dir}/inFOV_starnum_prob_{star_num}.pdf")
     
+    
+def main():
+    simulation()
+    analy_result()
+    # plot_prob(n=4)
+    # plot_prob(n=10)
 
 if __name__ == '__main__':
     # prof = LineProfiler()
