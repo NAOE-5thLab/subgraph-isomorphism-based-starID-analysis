@@ -90,9 +90,9 @@ contains
         integer :: i1, i2, i3, i4
         integer :: count_tiangleid
         integer :: candi_i
-        integer :: candi_j(N_set) = 0
-        integer :: candi_k(N_set) = 0
-        integer :: stage(N_set) = 0
+        integer :: candi_j(N_set)
+        integer :: candi_k(N_set)
+        integer :: stage(N_set)
         !
         s_hat_i = s_hat_set(1, :)
         s_hat_j = s_hat_set(2, :)
@@ -109,7 +109,10 @@ contains
         call get_pairids_of_candi_theta(&
             N_candi_pairid_jk, candi_pairid_jk, N_candi, &
             theta_hat_jk, epsilon, N_pairset, thetaset, pairidset)
-        ! 
+        !
+        candi_j = 0
+        candi_k = 0
+        stage = 0
         do i1 = 1, N_candi_pairid_ij
             candi_i = candi_pairid_ij(i1, 1)
             if (stage(candi_i) == 0) then
@@ -140,22 +143,22 @@ contains
                 do i3 = 1, N_candi_pairid_jk
                     if (candi_j(candi_i) == candi_pairid_jk(i3, 1)) then
                         if (candi_k(candi_i) == candi_pairid_jk(i3, 2)) then
-                            stage(candi_i) == 3
+                            stage(candi_i) = 3
                             count_tiangleid = count_tiangleid + 1
                             candi_triangleid_ijk_temp(count_tiangleid, 1) = candi_i
                             candi_triangleid_ijk_temp(count_tiangleid, 2) = candi_j(candi_i)
                             candi_triangleid_ijk_temp(count_tiangleid, 3) = candi_k(candi_i)
                         end if
-                    end if                  
+                    end if
                     if (candi_j(candi_i) == candi_pairid_jk(i3, 2)) then
                         if (candi_k(candi_i) == candi_pairid_jk(i3, 1)) then
-                            stage(candi_i) == 3
+                            stage(candi_i) = 3
                             count_tiangleid = count_tiangleid + 1
                             candi_triangleid_ijk_temp(count_tiangleid, 1) = candi_i
                             candi_triangleid_ijk_temp(count_tiangleid, 2) = candi_j(candi_i)
                             candi_triangleid_ijk_temp(count_tiangleid, 3) = candi_k(candi_i)
                         end if
-                    end if                  
+                    end if
                 end do
             end if
         end do
