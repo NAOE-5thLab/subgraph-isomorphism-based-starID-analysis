@@ -85,14 +85,16 @@ contains
         integer :: N_candi_pairid_ij, candi_pairid_ij(N_candi, 2)
         integer :: N_candi_pairid_ik, candi_pairid_ik(N_candi, 2)
         integer :: N_candi_pairid_jk, candi_pairid_jk(N_candi, 2)
+        integer, allocatable :: candi_pairid_ij_1d(:), candi_pairid_ik_1d(:)
+        integer, allocatable :: candi_pairid_ij_1d_uni(:), candi_pairid_ik_1d_uni(:)
+        integer :: N_candi_pairid_ij_1d_uni, N_candi_pairid_ik_1d_uni
+        integer :: N_candi_starid_i, candi_starid_i(N_candi)
+        integer :: N_candi_starid_j, candi_starid_j(N_candi)
+        integer :: N_candi_starid_k, candi_starid_k(N_candi)
         double precision :: obs_sign, candi_sign
         double precision :: vec_i(3), vec_j(3), vec_k(3)
-        integer :: i1, i2, i3, i4
-        integer :: count_tiangleid
-        integer :: candi_i
-        integer :: candi_j(N_set) = 0
-        integer :: candi_k(N_set) = 0
-        integer :: stage(N_set) = 0
+        integer :: i, i1, i2, i3, i4, i5, i6, i7, i8
+        integer :: count, count_tiangleid
         !
         s_hat_i = s_hat_set(1, :)
         s_hat_j = s_hat_set(2, :)
@@ -109,75 +111,103 @@ contains
         call get_pairids_of_candi_theta(&
             N_candi_pairid_jk, candi_pairid_jk, N_candi, &
             theta_hat_jk, epsilon, N_pairset, thetaset, pairidset)
-        ! 
-        do i1 = 1, N_candi_pairid_ij
-            candi_i = candi_pairid_ij(i1, 1)
-            if (stage(candi_i) == 0) then
-                stage(candi_i) = 1
-                candi_j(candi_i) = candi_pairid_ij(i1, 2)
-            end if
-            candi_i = candi_pairid_ij(i1, 2)
-            if (stage(candi_i) == 0) then
-                stage(candi_i) = 1
-                candi_j(candi_i) = candi_pairid_ij(i1, 1)
-            end if
-        end do
-        do i2 = 1, N_candi_pairid_ik
-            candi_i = candi_pairid_ik(i2, 1)
-            if (stage(candi_i) == 1) then
-                stage(candi_i) = 2
-                candi_k(candi_i) = candi_pairid_ik(i2, 2)
-            end if
-            candi_i = candi_pairid_ik(i2, 2)
-            if (stage(candi_i) == 1) then
-                stage(candi_i) = 2
-                candi_k(candi_i) = candi_pairid_ik(i2, 1)
+        ! select i
+        count = 0
+        ! convert 1d ij
+        allocate(candi_pairid_ij_1d(2*N_candi_pairid_ij), candi_pairid_ij_1d_uni(2*N_candi_pairid_ij))
+        candi_pairid_ij_1d(:N_candi_pairid_ij) = candi_pairid_ij(:N_candi_pairid_ij, 1)
+        candi_pairid_ij_1d(N_candi_pairid_ij+1:2*N_candi_pairid_ij) = candi_pairid_ij(:N_candi_pairid_ij, 2)
+        call unique_intarray1d(N_candi_pairid_ij_1d_uni, candi_pairid_ij_1d_uni, &
+                2*N_candi_pairid_ij, candi_pairid_ij_1d)
+        ! convert 1d ik
+        allocate(candi_pairid_ik_1d(2*N_candi_pairid_ik), candi_pairid_ik_1d_uni(2*N_candi_pairid_ik))
+        candi_pairid_ik_1d(:N_candi_pairid_ik) = candi_pairid_ik(:N_candi_pairid_ik, 1)
+        candi_pairid_ik_1d(N_candi_pairid_ik+1:2*N_candi_pairid_ik) = candi_pairid_ik(:N_candi_pairid_ik, 2)
+        call unique_intarray1d(N_candi_pairid_ik_1d_uni, candi_pairid_ik_1d_uni, &
+                2*N_candi_pairid_ik, candi_pairid_ik_1d)
+        !
+        do i1 = 1, N_candi_pairid_ij_1d_uni
+            if (any(candi_pairid_ij_1d_uni(i1) == candi_pairid_ik_1d_uni(1:N_candi_pairid_ik_1d_uni))) then
+                count = count + 1
+                candi_starid_i(count) = candi_pairid_ij_1d_uni(i1)
             end if
         end do
+        N_candi_starid_i = count
+        !
         count_tiangleid = 0
-        do candi_i = 1, N_set
-            if (stage(candi_i) == 2) then
-                do i3 = 1, N_candi_pairid_jk
-                    if (candi_j(candi_i) == candi_pairid_jk(i3, 1)) then
-                        if (candi_k(candi_i) == candi_pairid_jk(i3, 2)) then
-                            stage(candi_i) == 3
-                            count_tiangleid = count_tiangleid + 1
-                            candi_triangleid_ijk_temp(count_tiangleid, 1) = candi_i
-                            candi_triangleid_ijk_temp(count_tiangleid, 2) = candi_j(candi_i)
-                            candi_triangleid_ijk_temp(count_tiangleid, 3) = candi_k(candi_i)
-                        end if
-                    end if                  
-                    if (candi_j(candi_i) == candi_pairid_jk(i3, 2)) then
-                        if (candi_k(candi_i) == candi_pairid_jk(i3, 1)) then
-                            stage(candi_i) == 3
-                            count_tiangleid = count_tiangleid + 1
-                            candi_triangleid_ijk_temp(count_tiangleid, 1) = candi_i
-                            candi_triangleid_ijk_temp(count_tiangleid, 2) = candi_j(candi_i)
-                            candi_triangleid_ijk_temp(count_tiangleid, 3) = candi_k(candi_i)
-                        end if
-                    end if                  
+        do i2 = 1, N_candi_starid_i
+            ! select j-th candicate
+            count = 0
+            do i3 = 1, N_candi_pairid_ij
+                if (candi_pairid_ij(i3, 1) == candi_starid_i(i2)) then
+                    count = count + 1
+                    candi_starid_j(count) = candi_pairid_ij(i3, 2)
+                else if (candi_pairid_ij(i3, 2) == candi_starid_i(i2)) then
+                    count = count + 1
+                    candi_starid_j(count) = candi_pairid_ij(i3, 1)
+                end if
+            end do
+            N_candi_starid_j = count
+            ! select k-th candicate
+            count = 0
+            do i4 = 1, N_candi_pairid_ik
+                if (candi_pairid_ik(i4, 1) == candi_starid_i(i2)) then
+                    count = count + 1
+                    candi_starid_k(count) = candi_pairid_ik(i4, 2)
+                else if (candi_pairid_ik(i4, 2) == candi_starid_i(i2)) then
+                    count = count + 1
+                    candi_starid_k(count) = candi_pairid_ik(i4, 1)
+                end if
+            end do
+            N_candi_starid_k = count
+            ! select j&k-th pair stars candidate
+            do i5 = 1, N_candi_starid_j
+                do i6 = 1, N_candi_starid_k
+                    if (candi_starid_j(i5) < candi_starid_k(i6)) then
+                        do i7 = 1, N_candi_pairid_jk
+                            if (candi_pairid_jk(i7, 1) == candi_starid_j(i5) &
+                                    .and. candi_pairid_jk(i7, 2) == candi_starid_k(i6)) then
+                                count_tiangleid = count_tiangleid + 1
+                                candi_triangleid_ijk_temp(count_tiangleid, 1) = candi_starid_i(i2)
+                                candi_triangleid_ijk_temp(count_tiangleid, 2) = candi_starid_j(i5)
+                                candi_triangleid_ijk_temp(count_tiangleid, 3) = candi_starid_k(i6)
+                                exit;
+                            end if
+                        end do
+                    else
+                        do i7 = 1, N_candi_pairid_jk
+                            if (candi_pairid_jk(i7, 1) == candi_starid_k(i6) &
+                                    .and. candi_pairid_jk(i7, 2) == candi_starid_j(i5)) then
+                                count_tiangleid = count_tiangleid + 1
+                                candi_triangleid_ijk_temp(count_tiangleid, 1) = candi_starid_i(i2)
+                                candi_triangleid_ijk_temp(count_tiangleid, 2) = candi_starid_j(i5)
+                                candi_triangleid_ijk_temp(count_tiangleid, 3) = candi_starid_k(i6)
+                                exit;
+                            end if
+                        end do
+                    end if
                 end do
-            end if
+            end do
         end do
         N_candi_triangleid_ijk_temp = count_tiangleid
         ! check specular sign
         count_tiangleid = 0
         call triangle_specular_sign(obs_sign, s_hat_i, s_hat_j, s_hat_k)
-        do i4 = 1, N_candi_triangleid_ijk_temp
+        do i8 = 1, N_candi_triangleid_ijk_temp
             call equatorial2vec(vec_i, &
-                    RA_set(candi_triangleid_ijk_temp(i4, 1) + 1), &
-                    DE_set(candi_triangleid_ijk_temp(i4, 1) + 1))
+                    RA_set(candi_triangleid_ijk_temp(i8, 1) + 1), &
+                    DE_set(candi_triangleid_ijk_temp(i8, 1) + 1))
             call equatorial2vec(vec_j, &
-                    RA_set(candi_triangleid_ijk_temp(i4, 2) + 1), &
-                    DE_set(candi_triangleid_ijk_temp(i4, 2) + 1))
+                    RA_set(candi_triangleid_ijk_temp(i8, 2) + 1), &
+                    DE_set(candi_triangleid_ijk_temp(i8, 2) + 1))
             call equatorial2vec(vec_k, &
-                    RA_set(candi_triangleid_ijk_temp(i4, 3) + 1), &
-                    DE_set(candi_triangleid_ijk_temp(i4, 3) + 1))
+                    RA_set(candi_triangleid_ijk_temp(i8, 3) + 1), &
+                    DE_set(candi_triangleid_ijk_temp(i8, 3) + 1))
             ! 
             call triangle_specular_sign(candi_sign, vec_i, vec_j, vec_k)
             if (obs_sign*candi_sign > 0) then
                 count_tiangleid = count_tiangleid + 1
-                candi_triangleid_ijk(count_tiangleid, :) = candi_triangleid_ijk_temp(i4, :)
+                candi_triangleid_ijk(count_tiangleid, :) = candi_triangleid_ijk_temp(i8, :)
             end if
         end do
         N_candi_triangleid_ijk = count_tiangleid
@@ -392,4 +422,59 @@ contains
 
     end subroutine unique_intarray1d
 
+    !
+    !subroutine matching_set(&
+    !        N_candi_setid, candi_setid, &
+    !        n_obs, s_hat_set, epsilon, &
+    !        N_set, RA_set, DE_set, N_pairset, thetaset, pairidset)
+    !    implicit none;
+    !    integer, intent(in) :: n_obs
+    !    double precision, intent(in) :: s_hat_set(n_obs, 3)
+    !    double precision, intent(in) :: epsilon
+    !    integer, intent(in) :: N_set, N_pairset
+    !    double precision, intent(in) :: RA_set(N_set), DE_set(N_set)
+    !    double precision, intent(in) :: thetaset(N_pairset)
+    !    integer, intent(in) :: pairidset(N_pairset, 2)
+    !    integer, intent(out) :: N_candi_setid
+    !    integer, intent(out) :: candi_setid(N_pairset, n_obs)
+    !    !
+    !    integer :: pre_N_candi_setid
+    !    integer, allocatable :: pre_candi_setid(:, :)
+    !    integer :: N_candi_setid_temp
+    !    integer, allocatable :: candi_setid_temp(:, :)
+    !    ! 
+    !    integer :: n
+    !    !
+    !    if (n_obs == 2) then
+    !        call matching_pair(&
+    !            N_candi_setid, candi_setid, &
+    !            s_hat_set, epsilon, N_pairset, thetaset, pairidset)
+    !    else if (n_obs > 2) then
+    !        do n = 3, n_obs
+    !            if (n == 3) then
+    !                allocate(candi_setid_temp(N_pairset, n))
+    !                call matching_triangle(&
+    !                    N_candi_setid_temp, candi_setid_temp, &
+    !                    s_hat_set(:n, :), epsilon, &
+    !                    N_set, RA_set, DE_set, N_pairset, thetaset, pairidset)
+    !            else
+    !                deallocate(candi_setid_temp)
+    !                allocate(candi_setid_temp(N_pairset, n))
+    !                call matching_multiangle(&
+    !                    N_candi_setid_temp, candi_setid_temp, &
+    !                    n, pre_N_candi_setid, pre_candi_setid, &
+    !                    s_hat_set(:n, :), epsilon, N_pairset, thetaset, pairidset)
+    !                deallocate(pre_candi_setid)
+    !            end if
+    !            allocate(pre_candi_setid(N_pairset, n))
+    !            pre_N_candi_setid = N_candi_setid_temp
+    !            pre_candi_setid = candi_setid_temp
+    !        end do
+    !        N_candi_setid = N_candi_setid_temp
+    !        candi_setid = candi_setid_temp
+    !    else
+    !        print*, 'error : n_obs'
+    !    end if
+    !
+    !end subroutine matching_set
 end module subgraph_isomorphism_starid_detector
