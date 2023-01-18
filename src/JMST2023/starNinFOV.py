@@ -195,7 +195,7 @@ def analy_result():
     df = pd.DataFrame(range(true_max_n+1), columns=['n'])
     df['prob'] = pns[:true_max_n+1]
     df.to_csv(f'{log_dir}/inFOV_prob_FOV{FOV_deg}_obsMv{obsMv}_beta{cover_beta}.csv')
-    # plot 
+    # plot
     fig = plt.figure(figsize=FIG_SIZE, dpi=DPI)
     ax = fig.add_subplot(111)
     ax.plot(

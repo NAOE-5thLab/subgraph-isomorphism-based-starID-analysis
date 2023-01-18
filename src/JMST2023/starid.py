@@ -94,7 +94,7 @@ log_dir = './log/'
 pattern = patterns[args.i]
 # config
 seed = 100
-roopN = 1000
+roopN = 10000
 U = 4096
 limitMv = 5.5
 
@@ -342,6 +342,6 @@ def analy_result():
 
 
 if __name__ == '__main__':
-    main()
-    # analy_result()
+    # main()
+    analy_result()
     print('Task complete')
