@@ -87,11 +87,11 @@ contains
         integer :: N_candi_pairid_jk, candi_pairid_jk(N_candi, 2)
         double precision :: obs_sign, candi_sign
         double precision :: vec_i(3), vec_j(3), vec_k(3)
-        integer :: i1, i2, i3, i4
+        integer :: i1, i2, i3, i4, i5, i6
         integer :: count_tiangleid
         integer :: candi_i
-        integer :: candi_j(N_set)
-        integer :: candi_k(N_set)
+        integer :: candi_j(N_set), candi_j_count(N_set)
+        integer :: candi_k(N_set), candi_k_count(N_set)
         integer :: stage(N_set)
         !
         s_hat_i = s_hat_set(1, :)
@@ -112,53 +112,58 @@ contains
         !
         candi_j = 0
         candi_k = 0
+        candi_j_count = 0
+        candi_k_count = 0
         stage = 0
         do i1 = 1, N_candi_pairid_ij
             candi_i = candi_pairid_ij(i1, 1)
-            if (stage(candi_i) == 0) then
-                stage(candi_i) = 1
-                candi_j(candi_i) = candi_pairid_ij(i1, 2)
-            end if
+            stage(candi_i) = 1
+            candi_j_count(candi_i) = candi_j_count(candi_i) + 1
+            candi_j(candi_i, candi_j_count(candi_i)) = candi_pairid_ij(i1, 2)
+            !
             candi_i = candi_pairid_ij(i1, 2)
-            if (stage(candi_i) == 0) then
-                stage(candi_i) = 1
-                candi_j(candi_i) = candi_pairid_ij(i1, 1)
-            end if
+            stage(candi_i) = 1
+            candi_j_count(candi_i) = candi_j_count(candi_i) + 1
+            candi_j(candi_i, candi_j_count(candi_i)) = candi_pairid_ij(i1, 1)
         end do
         do i2 = 1, N_candi_pairid_ik
             candi_i = candi_pairid_ik(i2, 1)
             if (stage(candi_i) == 1) then
                 stage(candi_i) = 2
-                candi_k(candi_i) = candi_pairid_ik(i2, 2)
+                candi_k_count(candi_i) = candi_k_count(candi_i) + 1
+                candi_k(candi_i, candi_k_count(candi_i)) = candi_pairid_ik(i2, 2)
             end if
             candi_i = candi_pairid_ik(i2, 2)
             if (stage(candi_i) == 1) then
                 stage(candi_i) = 2
-                candi_k(candi_i) = candi_pairid_ik(i2, 1)
+                candi_k_count(candi_i) = candi_k_count(candi_i) + 1
+                candi_k(candi_i, candi_k_count(candi_i)) = candi_pairid_ik(i2, 1)
             end if
         end do
         count_tiangleid = 0
         do candi_i = 1, N_set
             if (stage(candi_i) == 2) then
                 do i3 = 1, N_candi_pairid_jk
-                    if (candi_j(candi_i) == candi_pairid_jk(i3, 1)) then
-                        if (candi_k(candi_i) == candi_pairid_jk(i3, 2)) then
-                            stage(candi_i) = 3
-                            count_tiangleid = count_tiangleid + 1
-                            candi_triangleid_ijk_temp(count_tiangleid, 1) = candi_i
-                            candi_triangleid_ijk_temp(count_tiangleid, 2) = candi_j(candi_i)
-                            candi_triangleid_ijk_temp(count_tiangleid, 3) = candi_k(candi_i)
-                        end if
-                    end if
-                    if (candi_j(candi_i) == candi_pairid_jk(i3, 2)) then
-                        if (candi_k(candi_i) == candi_pairid_jk(i3, 1)) then
-                            stage(candi_i) = 3
-                            count_tiangleid = count_tiangleid + 1
-                            candi_triangleid_ijk_temp(count_tiangleid, 1) = candi_i
-                            candi_triangleid_ijk_temp(count_tiangleid, 2) = candi_j(candi_i)
-                            candi_triangleid_ijk_temp(count_tiangleid, 3) = candi_k(candi_i)
-                        end if
-                    end if
+                    do i4 = 1, candi_j_count(candi_i)
+                        do i5 = 1, candi_k_count(candi_i)
+                            if (candi_j(candi_i, i4) == candi_pairid_jk(i3, 1) .and.
+                                    candi_k(candi_i, i5) == candi_pairid_jk(i3, 2)) then
+                                stage(candi_i) = 3
+                                count_tiangleid = count_tiangleid + 1
+                                candi_triangleid_ijk_temp(count_tiangleid, 1) = candi_i
+                                candi_triangleid_ijk_temp(count_tiangleid, 2) = candi_j(candi_i, i4)
+                                candi_triangleid_ijk_temp(count_tiangleid, 3) = candi_k(candi_i, i5)
+                            end if
+                            if (candi_j(candi_i, i4) == candi_pairid_jk(i3, 2) .and.
+                                    candi_k(candi_i, i5) == candi_pairid_jk(i3, 1)) then
+                                stage(candi_i) = 3
+                                count_tiangleid = count_tiangleid + 1
+                                candi_triangleid_ijk_temp(count_tiangleid, 1) = candi_i
+                                candi_triangleid_ijk_temp(count_tiangleid, 2) = candi_j(candi_i, i4)
+                                candi_triangleid_ijk_temp(count_tiangleid, 3) = candi_k(candi_i, i5)
+                            end if
+                        end do
+                    end do
                 end do
             end if
         end do
@@ -166,21 +171,21 @@ contains
         ! check specular sign
         count_tiangleid = 0
         call triangle_specular_sign(obs_sign, s_hat_i, s_hat_j, s_hat_k)
-        do i4 = 1, N_candi_triangleid_ijk_temp
+        do i6 = 1, N_candi_triangleid_ijk_temp
             call equatorial2vec(vec_i, &
-                    RA_set(candi_triangleid_ijk_temp(i4, 1) + 1), &
-                    DE_set(candi_triangleid_ijk_temp(i4, 1) + 1))
+                    RA_set(candi_triangleid_ijk_temp(i6, 1) + 1), &
+                    DE_set(candi_triangleid_ijk_temp(i6, 1) + 1))
             call equatorial2vec(vec_j, &
-                    RA_set(candi_triangleid_ijk_temp(i4, 2) + 1), &
-                    DE_set(candi_triangleid_ijk_temp(i4, 2) + 1))
+                    RA_set(candi_triangleid_ijk_temp(i6, 2) + 1), &
+                    DE_set(candi_triangleid_ijk_temp(i6, 2) + 1))
             call equatorial2vec(vec_k, &
-                    RA_set(candi_triangleid_ijk_temp(i4, 3) + 1), &
-                    DE_set(candi_triangleid_ijk_temp(i4, 3) + 1))
+                    RA_set(candi_triangleid_ijk_temp(i6, 3) + 1), &
+                    DE_set(candi_triangleid_ijk_temp(i6, 3) + 1))
             ! 
             call triangle_specular_sign(candi_sign, vec_i, vec_j, vec_k)
             if (obs_sign*candi_sign > 0) then
                 count_tiangleid = count_tiangleid + 1
-                candi_triangleid_ijk(count_tiangleid, :) = candi_triangleid_ijk_temp(i4, :)
+                candi_triangleid_ijk(count_tiangleid, :) = candi_triangleid_ijk_temp(i6, :)
             end if
         end do
         N_candi_triangleid_ijk = count_tiangleid
