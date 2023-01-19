@@ -90,8 +90,8 @@ contains
         integer :: i1, i2, i3, i4, i5, i6
         integer :: count_tiangleid
         integer :: candi_i
-        integer :: candi_j(N_set), candi_j_count(N_set)
-        integer :: candi_k(N_set), candi_k_count(N_set)
+        integer :: candi_j(N_set, N_set), candi_j_count(N_set)
+        integer :: candi_k(N_set, N_set), candi_k_count(N_set)
         integer :: stage(N_set)
         !
         s_hat_i = s_hat_set(1, :)
@@ -146,7 +146,7 @@ contains
                 do i3 = 1, N_candi_pairid_jk
                     do i4 = 1, candi_j_count(candi_i + 1)
                         do i5 = 1, candi_k_count(candi_i + 1)
-                            if (candi_j(candi_i + 1, i4) == candi_pairid_jk(i3, 1) .and.
+                            if (candi_j(candi_i + 1, i4) == candi_pairid_jk(i3, 1) .and. &
                                     candi_k(candi_i + 1, i5) == candi_pairid_jk(i3, 2)) then
                                 stage(candi_i + 1) = 3
                                 count_tiangleid = count_tiangleid + 1
@@ -154,7 +154,7 @@ contains
                                 candi_triangleid_ijk_temp(count_tiangleid, 2) = candi_j(candi_i + 1, i4)
                                 candi_triangleid_ijk_temp(count_tiangleid, 3) = candi_k(candi_i + 1, i5)
                             end if
-                            if (candi_j(candi_i + 1, i4) == candi_pairid_jk(i3, 2) .and.
+                            if (candi_j(candi_i + 1, i4) == candi_pairid_jk(i3, 2) .and. &
                                     candi_k(candi_i + 1, i5) == candi_pairid_jk(i3, 1)) then
                                 stage(candi_i + 1) = 3
                                 count_tiangleid = count_tiangleid + 1
