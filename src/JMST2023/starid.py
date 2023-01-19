@@ -21,7 +21,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument(
     "--i",
     type=int,
-    default=8,
+    default=1,
     help="degree")
 args = parser.parse_args()
 
@@ -110,7 +110,7 @@ theta_max = 2*np.arctan2(np.sqrt(2)*np.tan(FOV*0.5), 1)
 
 def main():
     header = [
-        'seed', 'N_obs', 'N_candi', 'match']
+        'seed', 'N_obs', 'N_candi', 'match', 'time']
     logger = Logger(log_dir, header)
     logger.reset()
 
@@ -190,7 +190,12 @@ def main():
                 match = obs_set == candi_set
             else:
                 match = False
-            # 
+            #
+            if N_obs == 2:
+                time = time_list[1] - time_list[0]
+            else:
+                time = time_list[N_obs-1] - time_list[1]
+            #
             if N_candi == 0:
                 print(f'!!! Warning : N_candi is zero in {round}!!!')
         else:
@@ -212,6 +217,7 @@ def main():
                                 obs_set = set(obs_ID[[i, j, k, l]])
                                 candi_set = set(star_ctlg.get_ID()[candi_index[0]])
                                 match = obs_set == candi_set
+                                time = time_list[4-1] - time_list[1]
                             if match:
                                 break
                         if match:
@@ -221,10 +227,11 @@ def main():
                 if match:
                     break
         ### Log ###
-        logger.append([sim_seed, N_obs, N_candi, int(match)])
+        logger.append([sim_seed, N_obs, N_candi, int(match), time])
     #
     fname = f'stats_FOV{FOV_deg}_obsMv{obsMv}_beta{cover_beta}'
     logger.save(fname)
+
 
 def equatorial2vec(alpha, delta):
     rets = np.empty((len(alpha), 3))
@@ -239,6 +246,7 @@ def rotate(R, vec):
     for i in range(R.shape[0]):
         ret[i, :, :] = np.dot(R[i], vec.T).T
     return ret
+
 
 def rotate_(R, vec):
     ret = np.empty((vec.shape[0], vec.shape[1]))
@@ -342,6 +350,6 @@ def analy_result():
 
 
 if __name__ == '__main__':
-    # main()
-    analy_result()
+    main()
+    # analy_result()
     print('Task complete')

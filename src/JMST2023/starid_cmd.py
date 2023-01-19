@@ -84,7 +84,7 @@ def main():
             counter += 1
             if counter >= len(patterns):
                 break
-        time.sleep(5)
+        time.sleep(10)
 
 
 if __name__ == '__main__':
