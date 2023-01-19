@@ -177,6 +177,7 @@ def main():
         if N_obs < 2:
             N_candi = 0
             match = False
+            time = 0.0
         elif N_obs < 5:
             candi_setid_each_list, time_list = matching_set_for_analysis(
                 N_obs, obs_s_vec, epsilon,
