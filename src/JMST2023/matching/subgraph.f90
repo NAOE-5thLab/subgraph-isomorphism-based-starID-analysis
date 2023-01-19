@@ -117,50 +117,50 @@ contains
         stage = 0
         do i1 = 1, N_candi_pairid_ij
             candi_i = candi_pairid_ij(i1, 1)
-            stage(candi_i) = 1
-            candi_j_count(candi_i) = candi_j_count(candi_i) + 1
-            candi_j(candi_i, candi_j_count(candi_i)) = candi_pairid_ij(i1, 2)
+            stage(candi_i + 1) = 1
+            candi_j_count(candi_i + 1) = candi_j_count(candi_i + 1) + 1
+            candi_j(candi_i + 1, candi_j_count(candi_i + 1)) = candi_pairid_ij(i1, 2)
             !
             candi_i = candi_pairid_ij(i1, 2)
-            stage(candi_i) = 1
-            candi_j_count(candi_i) = candi_j_count(candi_i) + 1
-            candi_j(candi_i, candi_j_count(candi_i)) = candi_pairid_ij(i1, 1)
+            stage(candi_i + 1) = 1
+            candi_j_count(candi_i + 1) = candi_j_count(candi_i + 1) + 1
+            candi_j(candi_i + 1, candi_j_count(candi_i + 1)) = candi_pairid_ij(i1, 1)
         end do
         do i2 = 1, N_candi_pairid_ik
             candi_i = candi_pairid_ik(i2, 1)
-            if (stage(candi_i) == 1) then
-                stage(candi_i) = 2
-                candi_k_count(candi_i) = candi_k_count(candi_i) + 1
-                candi_k(candi_i, candi_k_count(candi_i)) = candi_pairid_ik(i2, 2)
+            if (stage(candi_i + 1) == 1) then
+                stage(candi_i + 1) = 2
+                candi_k_count(candi_i + 1) = candi_k_count(candi_i + 1) + 1
+                candi_k(candi_i + 1, candi_k_count(candi_i + 1)) = candi_pairid_ik(i2, 2)
             end if
             candi_i = candi_pairid_ik(i2, 2)
-            if (stage(candi_i) == 1) then
-                stage(candi_i) = 2
-                candi_k_count(candi_i) = candi_k_count(candi_i) + 1
-                candi_k(candi_i, candi_k_count(candi_i)) = candi_pairid_ik(i2, 1)
+            if (stage(candi_i + 1) == 1) then
+                stage(candi_i + 1) = 2
+                candi_k_count(candi_i + 1) = candi_k_count(candi_i + 1) + 1
+                candi_k(candi_i + 1, candi_k_count(candi_i + 1)) = candi_pairid_ik(i2, 1)
             end if
         end do
         count_tiangleid = 0
-        do candi_i = 1, N_set
-            if (stage(candi_i) == 2) then
+        do candi_i = 0, N_set - 1
+            if (stage(candi_i + 1) == 2) then
                 do i3 = 1, N_candi_pairid_jk
-                    do i4 = 1, candi_j_count(candi_i)
-                        do i5 = 1, candi_k_count(candi_i)
-                            if (candi_j(candi_i, i4) == candi_pairid_jk(i3, 1) .and.
-                                    candi_k(candi_i, i5) == candi_pairid_jk(i3, 2)) then
-                                stage(candi_i) = 3
+                    do i4 = 1, candi_j_count(candi_i + 1)
+                        do i5 = 1, candi_k_count(candi_i + 1)
+                            if (candi_j(candi_i + 1, i4) == candi_pairid_jk(i3, 1) .and.
+                                    candi_k(candi_i + 1, i5) == candi_pairid_jk(i3, 2)) then
+                                stage(candi_i + 1) = 3
                                 count_tiangleid = count_tiangleid + 1
                                 candi_triangleid_ijk_temp(count_tiangleid, 1) = candi_i
-                                candi_triangleid_ijk_temp(count_tiangleid, 2) = candi_j(candi_i, i4)
-                                candi_triangleid_ijk_temp(count_tiangleid, 3) = candi_k(candi_i, i5)
+                                candi_triangleid_ijk_temp(count_tiangleid, 2) = candi_j(candi_i + 1, i4)
+                                candi_triangleid_ijk_temp(count_tiangleid, 3) = candi_k(candi_i + 1, i5)
                             end if
-                            if (candi_j(candi_i, i4) == candi_pairid_jk(i3, 2) .and.
-                                    candi_k(candi_i, i5) == candi_pairid_jk(i3, 1)) then
-                                stage(candi_i) = 3
+                            if (candi_j(candi_i + 1, i4) == candi_pairid_jk(i3, 2) .and.
+                                    candi_k(candi_i + 1, i5) == candi_pairid_jk(i3, 1)) then
+                                stage(candi_i + 1) = 3
                                 count_tiangleid = count_tiangleid + 1
                                 candi_triangleid_ijk_temp(count_tiangleid, 1) = candi_i
-                                candi_triangleid_ijk_temp(count_tiangleid, 2) = candi_j(candi_i, i4)
-                                candi_triangleid_ijk_temp(count_tiangleid, 3) = candi_k(candi_i, i5)
+                                candi_triangleid_ijk_temp(count_tiangleid, 2) = candi_j(candi_i + 1, i4)
+                                candi_triangleid_ijk_temp(count_tiangleid, 3) = candi_k(candi_i + 1, i5)
                             end if
                         end do
                     end do
