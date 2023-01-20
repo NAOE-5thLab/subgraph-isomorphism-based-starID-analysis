@@ -89,7 +89,7 @@ def main():
     plot_db()
 
 
-def plot_inFOV():    
+def plot_inFOV():
     logs = []
     for pattern in patterns:
         # param
@@ -114,45 +114,45 @@ def plot_inFOV():
     ax3 = fig.add_subplot(133)
 
     df_temp = df[df['obsMv'] == 3.5][df['beta'] == 0.0]
-    ax1.plot(df_temp['FOV_deg'], df_temp['P(n>=4)'], marker=marker, color = cm.viridis(0/5), label='$\\beta = 0.0$')
+    ax1.plot(df_temp['FOV_deg'], df_temp['P(n>=4)'], marker=marker, ls='dotted', color=cm.viridis(0/5), label='$\\beta = 0.0$')
     df_temp = df[df['obsMv'] == 3.5][df['beta'] == 0.2]
-    ax1.plot(df_temp['FOV_deg'], df_temp['P(n>=4)'], marker=marker, color = cm.viridis(1/5), label='$\\beta = 0.2$')
+    ax1.plot(df_temp['FOV_deg'], df_temp['P(n>=4)'], marker=marker, ls='dotted', color=cm.viridis(1/5), label='$\\beta = 0.2$')
     df_temp = df[df['obsMv'] == 3.5][df['beta'] == 0.4]
-    ax1.plot(df_temp['FOV_deg'], df_temp['P(n>=4)'], marker=marker, color = cm.viridis(2/5), label='$\\beta = 0.4$')
+    ax1.plot(df_temp['FOV_deg'], df_temp['P(n>=4)'], marker=marker, ls='dotted', color=cm.viridis(2/5), label='$\\beta = 0.4$')
     df_temp = df[df['obsMv'] == 3.5][df['beta'] == 0.6]
-    ax1.plot(df_temp['FOV_deg'], df_temp['P(n>=4)'], marker=marker, color = cm.viridis(3/5), label='$\\beta = 0.6$')
+    ax1.plot(df_temp['FOV_deg'], df_temp['P(n>=4)'], marker=marker, ls='dotted', color=cm.viridis(3/5), label='$\\beta = 0.6$')
     df_temp = df[df['obsMv'] == 3.5][df['beta'] == 0.8]
-    ax1.plot(df_temp['FOV_deg'], df_temp['P(n>=4)'], marker=marker, color = cm.viridis(4/5), label='$\\beta = 0.8$')
+    ax1.plot(df_temp['FOV_deg'], df_temp['P(n>=4)'], marker=marker, ls='dotted', color=cm.viridis(4/5), label='$\\beta = 0.8$')
     ax1.set_title('$M_{v} = 3.5$')
     ax1.set_xlabel('FOV [deg.]')
     ax1.set_ylabel('$P(N_{\mathrm{obs}} >= 4 \mid M_v, \\theta_{\mathrm{FOV}}, \\beta)$')
     ax1.set_ylim(-0.05, 1.05)
 
     df_temp = df[df['obsMv'] == 4.5][df['beta'] == 0.0]
-    ax2.plot(df_temp['FOV_deg'], df_temp['P(n>=4)'], marker=marker, color = cm.viridis(0/5), label='$\\beta = 0.0$')
+    ax2.plot(df_temp['FOV_deg'], df_temp['P(n>=4)'], marker=marker, ls='dotted', color=cm.viridis(0/5), label='$\\beta = 0.0$')
     df_temp = df[df['obsMv'] == 4.5][df['beta'] == 0.2]
-    ax2.plot(df_temp['FOV_deg'], df_temp['P(n>=4)'], marker=marker, color = cm.viridis(1/5), label='$\\beta = 0.2$')
+    ax2.plot(df_temp['FOV_deg'], df_temp['P(n>=4)'], marker=marker, ls='dotted', color=cm.viridis(1/5), label='$\\beta = 0.2$')
     df_temp = df[df['obsMv'] == 4.5][df['beta'] == 0.4]
-    ax2.plot(df_temp['FOV_deg'], df_temp['P(n>=4)'], marker=marker, color = cm.viridis(2/5), label='$\\beta = 0.4$')
+    ax2.plot(df_temp['FOV_deg'], df_temp['P(n>=4)'], marker=marker, ls='dotted', color=cm.viridis(2/5), label='$\\beta = 0.4$')
     df_temp = df[df['obsMv'] == 4.5][df['beta'] == 0.6]
-    ax2.plot(df_temp['FOV_deg'], df_temp['P(n>=4)'], marker=marker, color = cm.viridis(3/5), label='$\\beta = 0.6$')
+    ax2.plot(df_temp['FOV_deg'], df_temp['P(n>=4)'], marker=marker, ls='dotted', color=cm.viridis(3/5), label='$\\beta = 0.6$')
     df_temp = df[df['obsMv'] == 4.5][df['beta'] == 0.8]
-    ax2.plot(df_temp['FOV_deg'], df_temp['P(n>=4)'], marker=marker, color = cm.viridis(4/5), label='$\\beta = 0.8$')
+    ax2.plot(df_temp['FOV_deg'], df_temp['P(n>=4)'], marker=marker, ls='dotted', color=cm.viridis(4/5), label='$\\beta = 0.8$')
     ax2.set_title('$M_{v} = 4.5$')
     ax2.set_xlabel('FOV [deg.]')
     # ax2.set_ylabel('$P(N_{\mathrm{obs}} >= 4 \mid M_v, \\theta_{\mathrm{FOV}}, \\beta)$')
     ax2.set_ylim(-0.05, 1.05)
 
     df_temp = df[df['obsMv'] == 5.5][df['beta'] == 0.0]
-    ax3.plot(df_temp['FOV_deg'], df_temp['P(n>=4)'], marker=marker, color = cm.viridis(0/5), label='$\\beta = 0.0$')
+    ax3.plot(df_temp['FOV_deg'], df_temp['P(n>=4)'], marker=marker, ls='dotted', color=cm.viridis(0/5), label='$\\beta = 0.0$')
     df_temp = df[df['obsMv'] == 5.5][df['beta'] == 0.2]
-    ax3.plot(df_temp['FOV_deg'], df_temp['P(n>=4)'], marker=marker, color = cm.viridis(1/5), label='$\\beta = 0.2$')
+    ax3.plot(df_temp['FOV_deg'], df_temp['P(n>=4)'], marker=marker, ls='dotted', color=cm.viridis(1/5), label='$\\beta = 0.2$')
     df_temp = df[df['obsMv'] == 5.5][df['beta'] == 0.4]
-    ax3.plot(df_temp['FOV_deg'], df_temp['P(n>=4)'], marker=marker, color = cm.viridis(2/5), label='$\\beta = 0.4$')
+    ax3.plot(df_temp['FOV_deg'], df_temp['P(n>=4)'], marker=marker, ls='dotted', color=cm.viridis(2/5), label='$\\beta = 0.4$')
     df_temp = df[df['obsMv'] == 5.5][df['beta'] == 0.6]
-    ax3.plot(df_temp['FOV_deg'], df_temp['P(n>=4)'], marker=marker, color = cm.viridis(3/5), label='$\\beta = 0.6$')
+    ax3.plot(df_temp['FOV_deg'], df_temp['P(n>=4)'], marker=marker, ls='dotted', color=cm.viridis(3/5), label='$\\beta = 0.6$')
     df_temp = df[df['obsMv'] == 5.5][df['beta'] == 0.8]
-    ax3.plot(df_temp['FOV_deg'], df_temp['P(n>=4)'], marker=marker, color = cm.viridis(4/5), label='$\\beta = 0.8$')
+    ax3.plot(df_temp['FOV_deg'], df_temp['P(n>=4)'], marker=marker, ls='dotted', color=cm.viridis(4/5), label='$\\beta = 0.8$')
     ax3.set_title('$M_{v} = 5.5$')
     ax3.set_xlabel('FOV [deg.]')
     # ax3.set_ylabel('$P(N_{\mathrm{obs}} >= 4 \mid M_v, \\theta_{\mathrm{FOV}}, \\beta)$')
@@ -170,45 +170,45 @@ def plot_inFOV():
     ax3 = fig.add_subplot(133)
 
     df_temp = df[df['obsMv'] == 3.5][df['beta'] == 0.0]
-    ax1.plot(df_temp['FOV_deg'], df_temp['P(n>=10)'], marker=marker, color = cm.viridis(0/5), label='$\\beta = 0.0$')
+    ax1.plot(df_temp['FOV_deg'], df_temp['P(n>=10)'], marker=marker, ls='dotted', color=cm.viridis(0/5), label='$\\beta = 0.0$')
     df_temp = df[df['obsMv'] == 3.5][df['beta'] == 0.2]
-    ax1.plot(df_temp['FOV_deg'], df_temp['P(n>=10)'], marker=marker, color = cm.viridis(1/5), label='$\\beta = 0.2$')
+    ax1.plot(df_temp['FOV_deg'], df_temp['P(n>=10)'], marker=marker, ls='dotted', color=cm.viridis(1/5), label='$\\beta = 0.2$')
     df_temp = df[df['obsMv'] == 3.5][df['beta'] == 0.4]
-    ax1.plot(df_temp['FOV_deg'], df_temp['P(n>=10)'], marker=marker, color = cm.viridis(2/5), label='$\\beta = 0.4$')
+    ax1.plot(df_temp['FOV_deg'], df_temp['P(n>=10)'], marker=marker, ls='dotted', color=cm.viridis(2/5), label='$\\beta = 0.4$')
     df_temp = df[df['obsMv'] == 3.5][df['beta'] == 0.6]
-    ax1.plot(df_temp['FOV_deg'], df_temp['P(n>=10)'], marker=marker, color = cm.viridis(3/5), label='$\\beta = 0.6$')
+    ax1.plot(df_temp['FOV_deg'], df_temp['P(n>=10)'], marker=marker, ls='dotted', color=cm.viridis(3/5), label='$\\beta = 0.6$')
     df_temp = df[df['obsMv'] == 3.5][df['beta'] == 0.8]
-    ax1.plot(df_temp['FOV_deg'], df_temp['P(n>=10)'], marker=marker, color = cm.viridis(4/5), label='$\\beta = 0.8$')
+    ax1.plot(df_temp['FOV_deg'], df_temp['P(n>=10)'], marker=marker, ls='dotted', color=cm.viridis(4/5), label='$\\beta = 0.8$')
     ax1.set_title('$M_{v} = 3.5$')
     ax1.set_xlabel('FOV [deg.]')
     ax1.set_ylabel('$P(N_{\mathrm{obs}} >= 10 \mid M_v, \\theta_{\mathrm{FOV}}, \\beta)$')
     ax1.set_ylim(-0.05, 1.05)
 
     df_temp = df[df['obsMv'] == 4.5][df['beta'] == 0.0]
-    ax2.plot(df_temp['FOV_deg'], df_temp['P(n>=10)'], marker=marker, color = cm.viridis(0/5), label='$\\beta = 0.0$')
+    ax2.plot(df_temp['FOV_deg'], df_temp['P(n>=10)'], marker=marker, ls='dotted', color=cm.viridis(0/5), label='$\\beta = 0.0$')
     df_temp = df[df['obsMv'] == 4.5][df['beta'] == 0.2]
-    ax2.plot(df_temp['FOV_deg'], df_temp['P(n>=10)'], marker=marker, color = cm.viridis(1/5), label='$\\beta = 0.2$')
+    ax2.plot(df_temp['FOV_deg'], df_temp['P(n>=10)'], marker=marker, ls='dotted', color=cm.viridis(1/5), label='$\\beta = 0.2$')
     df_temp = df[df['obsMv'] == 4.5][df['beta'] == 0.4]
-    ax2.plot(df_temp['FOV_deg'], df_temp['P(n>=10)'], marker=marker, color = cm.viridis(2/5), label='$\\beta = 0.4$')
+    ax2.plot(df_temp['FOV_deg'], df_temp['P(n>=10)'], marker=marker, ls='dotted', color=cm.viridis(2/5), label='$\\beta = 0.4$')
     df_temp = df[df['obsMv'] == 4.5][df['beta'] == 0.6]
-    ax2.plot(df_temp['FOV_deg'], df_temp['P(n>=10)'], marker=marker, color = cm.viridis(3/5), label='$\\beta = 0.6$')
+    ax2.plot(df_temp['FOV_deg'], df_temp['P(n>=10)'], marker=marker, ls='dotted', color=cm.viridis(3/5), label='$\\beta = 0.6$')
     df_temp = df[df['obsMv'] == 4.5][df['beta'] == 0.8]
-    ax2.plot(df_temp['FOV_deg'], df_temp['P(n>=10)'], marker=marker, color = cm.viridis(4/5), label='$\\beta = 0.8$')
+    ax2.plot(df_temp['FOV_deg'], df_temp['P(n>=10)'], marker=marker, ls='dotted', color=cm.viridis(4/5), label='$\\beta = 0.8$')
     ax2.set_title('$M_{v} = 4.5$')
     ax2.set_xlabel('FOV [deg.]')
     # ax2.set_ylabel('$P(N_{\mathrm{obs}} >= 10 \mid M_v, \\theta_{\mathrm{FOV}}, \\beta)$')
     ax2.set_ylim(-0.05, 1.05)
 
     df_temp = df[df['obsMv'] == 5.5][df['beta'] == 0.0]
-    ax3.plot(df_temp['FOV_deg'], df_temp['P(n>=10)'], marker=marker, color = cm.viridis(0/5), label='$\\beta = 0.0$')
+    ax3.plot(df_temp['FOV_deg'], df_temp['P(n>=10)'], marker=marker, ls='dotted', color=cm.viridis(0/5), label='$\\beta = 0.0$')
     df_temp = df[df['obsMv'] == 5.5][df['beta'] == 0.2]
-    ax3.plot(df_temp['FOV_deg'], df_temp['P(n>=10)'], marker=marker, color = cm.viridis(1/5), label='$\\beta = 0.2$')
+    ax3.plot(df_temp['FOV_deg'], df_temp['P(n>=10)'], marker=marker, ls='dotted', color=cm.viridis(1/5), label='$\\beta = 0.2$')
     df_temp = df[df['obsMv'] == 5.5][df['beta'] == 0.4]
-    ax3.plot(df_temp['FOV_deg'], df_temp['P(n>=10)'], marker=marker, color = cm.viridis(2/5), label='$\\beta = 0.4$')
+    ax3.plot(df_temp['FOV_deg'], df_temp['P(n>=10)'], marker=marker, ls='dotted', color=cm.viridis(2/5), label='$\\beta = 0.4$')
     df_temp = df[df['obsMv'] == 5.5][df['beta'] == 0.6]
-    ax3.plot(df_temp['FOV_deg'], df_temp['P(n>=10)'], marker=marker, color = cm.viridis(3/5), label='$\\beta = 0.6$')
+    ax3.plot(df_temp['FOV_deg'], df_temp['P(n>=10)'], marker=marker, ls='dotted', color=cm.viridis(3/5), label='$\\beta = 0.6$')
     df_temp = df[df['obsMv'] == 5.5][df['beta'] == 0.8]
-    ax3.plot(df_temp['FOV_deg'], df_temp['P(n>=10)'], marker=marker, color = cm.viridis(4/5), label='$\\beta = 0.8$')
+    ax3.plot(df_temp['FOV_deg'], df_temp['P(n>=10)'], marker=marker, ls='dotted', color=cm.viridis(4/5), label='$\\beta = 0.8$')
     ax3.set_title('$M_{v} = 5.5$')
     ax3.set_xlabel('FOV [deg.]')
     # ax3.set_ylabel('$P(N_{\mathrm{obs}} >= 10 \mid M_v, \\theta_{\mathrm{FOV}}, \\beta)$')
@@ -243,45 +243,45 @@ def plot_matching():
     ax3 = fig.add_subplot(133)
 
     df_temp = df[df['obsMv'] == 3.5][df['beta'] == 0.0]
-    ax1.plot(df_temp['FOV_deg'], df_temp['match_prob'], marker=marker, color = cm.viridis(0/5), label='$\\beta = 0.0$')
+    ax1.plot(df_temp['FOV_deg'], df_temp['match_prob'], marker=marker, ls='dotted', color=cm.viridis(0/5), label='$\\beta = 0.0$')
     df_temp = df[df['obsMv'] == 3.5][df['beta'] == 0.2]
-    ax1.plot(df_temp['FOV_deg'], df_temp['match_prob'], marker=marker, color = cm.viridis(1/5), label='$\\beta = 0.2$')
+    ax1.plot(df_temp['FOV_deg'], df_temp['match_prob'], marker=marker, ls='dotted', color=cm.viridis(1/5), label='$\\beta = 0.2$')
     df_temp = df[df['obsMv'] == 3.5][df['beta'] == 0.4]
-    ax1.plot(df_temp['FOV_deg'], df_temp['match_prob'], marker=marker, color = cm.viridis(2/5), label='$\\beta = 0.4$')
+    ax1.plot(df_temp['FOV_deg'], df_temp['match_prob'], marker=marker, ls='dotted', color=cm.viridis(2/5), label='$\\beta = 0.4$')
     df_temp = df[df['obsMv'] == 3.5][df['beta'] == 0.6]
-    ax1.plot(df_temp['FOV_deg'], df_temp['match_prob'], marker=marker, color = cm.viridis(3/5), label='$\\beta = 0.6$')
+    ax1.plot(df_temp['FOV_deg'], df_temp['match_prob'], marker=marker, ls='dotted', color=cm.viridis(3/5), label='$\\beta = 0.6$')
     df_temp = df[df['obsMv'] == 3.5][df['beta'] == 0.8]
-    ax1.plot(df_temp['FOV_deg'], df_temp['match_prob'], marker=marker, color = cm.viridis(4/5), label='$\\beta = 0.8$')
+    ax1.plot(df_temp['FOV_deg'], df_temp['match_prob'], marker=marker, ls='dotted', color=cm.viridis(4/5), label='$\\beta = 0.8$')
     ax1.set_title('$M_{v} = 3.5$')
     ax1.set_xlabel('FOV [deg.]')
     ax1.set_ylabel('Matching Probability')
     ax1.set_ylim(-0.05, 1.05)
 
     df_temp = df[df['obsMv'] == 4.5][df['beta'] == 0.0]
-    ax2.plot(df_temp['FOV_deg'], df_temp['match_prob'], marker=marker, color = cm.viridis(0/5), label='$\\beta = 0.0$')
+    ax2.plot(df_temp['FOV_deg'], df_temp['match_prob'], marker=marker, ls='dotted', color=cm.viridis(0/5), label='$\\beta = 0.0$')
     df_temp = df[df['obsMv'] == 4.5][df['beta'] == 0.2]
-    ax2.plot(df_temp['FOV_deg'], df_temp['match_prob'], marker=marker, color = cm.viridis(1/5), label='$\\beta = 0.2$')
+    ax2.plot(df_temp['FOV_deg'], df_temp['match_prob'], marker=marker, ls='dotted', color=cm.viridis(1/5), label='$\\beta = 0.2$')
     df_temp = df[df['obsMv'] == 4.5][df['beta'] == 0.4]
-    ax2.plot(df_temp['FOV_deg'], df_temp['match_prob'], marker=marker, color = cm.viridis(2/5), label='$\\beta = 0.4$')
+    ax2.plot(df_temp['FOV_deg'], df_temp['match_prob'], marker=marker, ls='dotted', color=cm.viridis(2/5), label='$\\beta = 0.4$')
     df_temp = df[df['obsMv'] == 4.5][df['beta'] == 0.6]
-    ax2.plot(df_temp['FOV_deg'], df_temp['match_prob'], marker=marker, color = cm.viridis(3/5), label='$\\beta = 0.6$')
+    ax2.plot(df_temp['FOV_deg'], df_temp['match_prob'], marker=marker, ls='dotted', color=cm.viridis(3/5), label='$\\beta = 0.6$')
     df_temp = df[df['obsMv'] == 4.5][df['beta'] == 0.8]
-    ax2.plot(df_temp['FOV_deg'], df_temp['match_prob'], marker=marker, color = cm.viridis(4/5), label='$\\beta = 0.8$')
+    ax2.plot(df_temp['FOV_deg'], df_temp['match_prob'], marker=marker, ls='dotted', color=cm.viridis(4/5), label='$\\beta = 0.8$')
     ax2.set_title('$M_{v} = 4.5$')
     ax2.set_xlabel('FOV [deg.]')
     # ax2.set_ylabel('Matching Probability')
     ax2.set_ylim(-0.05, 1.05)
 
     df_temp = df[df['obsMv'] == 5.5][df['beta'] == 0.0]
-    ax3.plot(df_temp['FOV_deg'], df_temp['match_prob'], marker=marker, color = cm.viridis(0/5), label='$\\beta = 0.0$')
+    ax3.plot(df_temp['FOV_deg'], df_temp['match_prob'], marker=marker, ls='dotted', color=cm.viridis(0/5), label='$\\beta = 0.0$')
     df_temp = df[df['obsMv'] == 5.5][df['beta'] == 0.2]
-    ax3.plot(df_temp['FOV_deg'], df_temp['match_prob'], marker=marker, color = cm.viridis(1/5), label='$\\beta = 0.2$')
+    ax3.plot(df_temp['FOV_deg'], df_temp['match_prob'], marker=marker, ls='dotted', color=cm.viridis(1/5), label='$\\beta = 0.2$')
     df_temp = df[df['obsMv'] == 5.5][df['beta'] == 0.4]
-    ax3.plot(df_temp['FOV_deg'], df_temp['match_prob'], marker=marker, color = cm.viridis(2/5), label='$\\beta = 0.4$')
+    ax3.plot(df_temp['FOV_deg'], df_temp['match_prob'], marker=marker, ls='dotted', color=cm.viridis(2/5), label='$\\beta = 0.4$')
     df_temp = df[df['obsMv'] == 5.5][df['beta'] == 0.6]
-    ax3.plot(df_temp['FOV_deg'], df_temp['match_prob'], marker=marker, color = cm.viridis(3/5), label='$\\beta = 0.6$')
+    ax3.plot(df_temp['FOV_deg'], df_temp['match_prob'], marker=marker, ls='dotted', color=cm.viridis(3/5), label='$\\beta = 0.6$')
     df_temp = df[df['obsMv'] == 5.5][df['beta'] == 0.8]
-    ax3.plot(df_temp['FOV_deg'], df_temp['match_prob'], marker=marker, color = cm.viridis(4/5), label='$\\beta = 0.8$')
+    ax3.plot(df_temp['FOV_deg'], df_temp['match_prob'], marker=marker, ls='dotted', color=cm.viridis(4/5), label='$\\beta = 0.8$')
     ax3.set_title('$M_{v} = 5.5$')
     ax3.set_xlabel('FOV [deg.]')
     # ax3.set_ylabel('Matching Probability')
@@ -291,15 +291,16 @@ def plot_matching():
     fig.tight_layout()
     fname = 'matching_prob.pdf'
     fig.savefig(log_dir+fname)
-    
+
+
 def plot_db():
     ### db size ###
-    fig = plt.figure(figsize=(4, 2), dpi=DPI)
+    fig = plt.figure(figsize=FIG_SIZE, dpi=DPI)
     ax1 = fig.add_subplot(121)
     ax2 = fig.add_subplot(122)
-    # 
+    #
     data = []
-    for i, FOV_deg in enumerate([20, 40, 60, 80]): 
+    for i, FOV_deg in enumerate([20, 40, 60, 80]):
         U = 4096
         limitMv = 5.5
         FOV = deg2rad(FOV_deg)
@@ -317,12 +318,12 @@ def plot_db():
             log_dir=log_dir)
         angle_ctlg.create_catalog(theta_max=theta_max, use_log=False)
         angles = angle_ctlg.get_inter_angles()
-        # 
+        #
         data.append([FOV_deg, len(angles)])
     data = np.array(data)
-    ax1.plot(data[:, 0], data[:, 1], marker=marker, color = cm.viridis(0/5))
+    ax1.plot(data[:, 0], data[:, 1], marker=marker, ls='dotted', color = cm.viridis(9/10))
     ax1.set_xlabel('FOV [deg.]')
-    ax1.set_ylabel('Batabase size')
+    ax1.set_ylabel('Database size ($\mathcal{I}_{\mathrm{pair}}$)')
 
     ### matching time ###
     t_2_data = {20: [], 40: [], 60: [], 80: []}
@@ -342,22 +343,28 @@ def plot_db():
         t_2_data[FOV_deg].append(time[N_obs == 2])
         t_3_data[FOV_deg].append(time[N_obs == 3])
         t_4_data[FOV_deg].append(time[N_obs >= 4])
-    
+
     logs = []
     for FOV_deg in [20, 40, 60, 80]:
         log = {'FOV_deg': FOV_deg}
         log['t_2'] = np.hstack(t_2_data[FOV_deg]).mean()
         log['t_3'] = np.hstack(t_3_data[FOV_deg]).mean()
         log['t_4'] = np.hstack(t_4_data[FOV_deg]).mean()
-        logs.appendlogz(log)
+        logs.append(log)
     df = pd.DataFrame(logs)
-    
-    ax2.plot(df['FOV_deg'], df['t_2'], marker=marker, color = cm.viridis(0/3), label='$N_{\mathrm{obs}} = 2$')
-    ax2.plot(df['FOV_deg'], df['t_3'], marker=marker, color = cm.viridis(1/3), label='$N_{\mathrm{obs}} = 3$')
-    ax2.plot(df['FOV_deg'], df['t_4'], marker=marker, color = cm.viridis(2/3), label='$N_{\mathrm{obs}} \geq 4$')
+
+    ax2.plot(df['FOV_deg'], df['t_2'], marker=marker, ls='dotted', color=cm.viridis(0/3), label='$N_{\mathrm{obs}} = 2$')
+    ax2.plot(df['FOV_deg'], df['t_3'], marker=marker, ls='dotted', color=cm.viridis(1/3), label='$N_{\mathrm{obs}} = 3$')
+    ax2.plot(df['FOV_deg'], df['t_4'], marker=marker, ls='dotted', color=cm.viridis(2/3), label='$N_{\mathrm{obs}} \geq 4$')
+    # ax2.set_yscale('log')
     ax2.set_xlabel('FOV [deg.]')
-    ax2.set_ylabel('Runtime')
-    # ax2.set_ylim(-0.05, 1.05)
+    ax2.set_ylabel('Runtime [s]')
+    # ax2.set_ylim(-0.0005, 10.0)
+    ax2.legend()
+
+    fig.tight_layout()
+    fname = 'runtime.pdf'
+    fig.savefig(log_dir+fname)
 
 
 def convert_for_step_plot(bins, pd):
