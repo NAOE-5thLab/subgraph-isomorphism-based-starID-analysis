@@ -1,5 +1,4 @@
 import numpy as np
-
 # from numba import jit
 
 
@@ -12,24 +11,24 @@ def vec2equatorial(vec):
     vec_dot_ez = np.inner(vec, e_z)
     vec_abs = np.linalg.norm(vec)
     ez_abs = np.linalg.norm(e_z)
-    delta = np.pi / 2 - np.arccos(vec_dot_ez / (vec_abs * ez_abs))
+    delta = np.pi/2 - np.arccos(vec_dot_ez/(vec_abs*ez_abs))
     #
-    orthographic_ez_s1 = vec_dot_ez / ez_abs**2 * e_z
+    orthographic_ez_s1 = vec_dot_ez/ez_abs**2 * e_z
     orthographic_ez_s1_prime = vec - orthographic_ez_s1
     o_dot_ex = np.inner(orthographic_ez_s1_prime, e_x)
     o_abs = np.linalg.norm(orthographic_ez_s1_prime)
     ex_abs = np.linalg.norm(e_x)
-    alpha = np.arccos(o_dot_ex / (o_abs * ex_abs))
+    alpha = np.arccos(o_dot_ex/(o_abs*ex_abs))
     return alpha, delta
 
 
 # @jit
 def equatorial2vec(alpha, delta):
-    rets = np.empty((len(alpha), 3))
-    rets[:, 0] = np.cos(alpha) * np.cos(delta)
-    rets[:, 1] = np.sin(alpha) * np.cos(delta)
-    rets[:, 2] = np.sin(delta)
+    x = np.cos(alpha) * np.cos(delta)
+    y = np.sin(alpha) * np.cos(delta)
+    z = np.sin(delta)
     if alpha.shape == ():
-        return rets[0]
+        return np.array([x, y, z])
     else:
-        return rets
+        return np.concatenate(
+            [x[:, np.newaxis], y[:, np.newaxis], z[:, np.newaxis]], axis=1)
