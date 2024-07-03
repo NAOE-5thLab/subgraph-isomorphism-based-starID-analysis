@@ -57,11 +57,12 @@ class YaleStarCatalog:
         path = f"{self.log_dir}/temp.csv"
         if not os.path.exists(os.path.dirname(path)):
             os.makedirs(os.path.dirname(path))
-        print("----- Yale Bright Star Catalog -----")
         self.load()
         self.reshape()
         self.save_df()
-        #
+
+    def get_info(self):
+        print("----- Yale Bright Star Catalog -----")
         Vmag = self.get_Vmag()
         print(f"the number of stars : {len(self.get_HR())}")
         print(f"the range of magnitude : [{min(Vmag)}, {max(Vmag)}]")

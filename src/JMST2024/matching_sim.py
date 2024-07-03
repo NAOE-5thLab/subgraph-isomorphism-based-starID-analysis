@@ -1,8 +1,10 @@
+import os
+import time
 import itertools
+import multiprocessing
 
 import numpy as np
 from scipy.stats import special_ortho_group
-from scipy.stats import binom
 
 from subgraph import (
     YaleStarCatalog,
@@ -21,13 +23,14 @@ from utils import (
 # os
 log_dir = "./log/matching/"
 seed = 100
+multi = True
 # param
 U = 1024
 # sampling
-N_loop = int(1e2) + 1
+N_loop = int(1e1) + 1
 # N_loop = int(1e4) + 1
 # pattern
-theta_FOV_list = [40, 80]
+theta_FOV_list = [5, 10, 20, 40, 80]
 M_lim_list = [3.5, 4.5, 5.5]
 beta_list = [0.0, 0.2, 0.4, 0.6, 0.8]
 M_lim_max = max(M_lim_list)
@@ -55,7 +58,6 @@ def matching_sim(theta_FOV, M_lim, beta):
     D_DB = StarDatabase(df_D_C)
     D_DB.filtering_by_visual_magnitude(M_lim_max)
     D_DB.filtering_by_multiple_stars(theta_min)
-    D_DB.get_info()
     D_DB_HR = D_DB.get_HR()
     # PairDB
     P_DB = PairDatabase(D_DB.get_df(), log_dir=cash_dir)
@@ -65,38 +67,41 @@ def matching_sim(theta_FOV, M_lim, beta):
     D_DB_OBS.filtering_by_visual_magnitude(M_lim_max)
     D_DB_OBS.filtering_by_multiple_stars(theta_min)
     D_DB_OBS.filtering_by_visual_magnitude(M_lim)
-    D_DB_OBS.get_info()
     # matching
     matching = SubgraphIsomorphismBasedMatching(D_DB, P_DB, epsilon)
 
     ### Simulation ###
     with open(path, "w") as f:
-        header = ["index", "N_obs", "N_candi", "unique", "included"]
+        header = ["index", "N_obs", "N_match", "N_candi", "unique", "included"]
         for data in header[:-1]:
             f.write(f"{data},")
         f.write(f"{header[-1]}\n")
     #
     log_list = []
     for i in range(N_loop):
-        print(f"\r{i}/{N_loop}", end="")
+        print(f"\r{os.path.basename(path)[:-3]} : {i}/{N_loop}", end="")
         ### Observed stars ###
         s_vec_hat, obs_HR = get_random_stars(
             D_DB_OBS, np_random, theta_FOV, beta, epsilon
         )
         ### Matching ###
-        candi_IDs, obs_IDs = matching.match_p_stars(s_vec_hat)
+        candi_IDs, obs_IDs, info = matching.match_stars(
+            s_vec_hat, np_random, with_check=False
+        )
         #
         N_obs = len(s_vec_hat)
+        N_match = len(info["N_candi"])
         N_candi = len(candi_IDs)
+        #
         unique = N_candi == 1
         included = []
         for candi_ID in candi_IDs:
             included.append(set(obs_HR[obs_IDs]) == set(D_DB_HR[candi_ID]))
         included = any(included)
         ### Save result ###
-        log_list.append([i, N_obs, N_candi, unique, included])
+        log_list.append([i, N_obs, N_match, N_candi, unique, included])
         # save
-        freq = 100
+        freq = 10
         if (i % freq == 0) and (i != 0):
             with open(path, "a") as f:
                 for log in log_list[i - freq + 1 : i + 1]:
@@ -158,8 +163,30 @@ def rotate_(R, vec):
 
 
 if __name__ == "__main__":
-    for theta_FOV, M_lim, beta_list in list(
-        itertools.product(theta_FOV_list, M_lim_list, beta_list)
-    ):
-        log_list = matching_sim(theta_FOV, M_lim, beta_list)
+    patterns = list(itertools.product(theta_FOV_list, M_lim_list, beta_list))
+    i = 0
+    if multi:
+        processes = []
+        while True:
+            if len(processes) >= multiprocessing.cpu_count() - 1:
+                for process in processes:
+                    if not process.is_alive():
+                        process.join()
+                        processes.remove(process)
+            else:
+                theta_FOV, M_lim, beta = patterns[i]
+                i += 1
+                #
+                process = multiprocessing.Process(
+                    target=matching_sim, args=(theta_FOV, M_lim, beta)
+                )
+                processes.append(process)
+                process.start()
+                #
+                if len(patterns) <= i:
+                    break
+            time.sleep(1)
+    else:
+        for theta_FOV, M_lim, beta_list in patterns:
+            log_list = matching_sim(theta_FOV, M_lim, beta_list)
     print("Task complete")
