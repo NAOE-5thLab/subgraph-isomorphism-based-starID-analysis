@@ -27,8 +27,8 @@ multi = True
 # param
 U = 1024
 # sampling
-N_loop = int(1e1) + 1
-# N_loop = int(1e4) + 1
+# N_loop = int(1e1) + 1
+N_loop = int(1e4) + 1
 # pattern
 theta_FOV_list = [5, 10, 20, 40, 80]
 M_lim_list = [3.5, 4.5, 5.5]

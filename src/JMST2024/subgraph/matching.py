@@ -29,7 +29,7 @@ class SubgraphIsomorphismBasedMatching:
         for obs_IDs, pattern in self.pattern_shuffling(s_hat_list, np_random):
             p = len(pattern)
             if p == 1:
-                candi_pcombIDs = [np.arange(len(self.D_DB.D_DB))]
+                candi_pcombIDs = [[i] for i in range(len(self.D_DB.D_DB))]
             elif p == 2:
                 candi_pcombIDs = self.match_2_stars(pattern)
             elif p == 3:
