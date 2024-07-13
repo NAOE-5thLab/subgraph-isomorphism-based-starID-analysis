@@ -16,6 +16,8 @@ from utils import (
     limit_uniform_spherical_vector,
     rodrigues_rotation_matrix,
     equatorial2vec,
+    vec2equatorial,
+    equatorial2galactic,
 )
 
 
@@ -27,8 +29,8 @@ multi = True
 # param
 U = 1024
 # sampling
-# N_loop = int(1e1) + 1
-N_loop = int(1e4) + 1
+N_loop = int(1e1) + 1
+# N_loop = int(3e4) + 1
 # pattern
 theta_FOV_list = [5, 10, 20, 40, 80]
 M_lim_list = [3.5, 4.5, 5.5]
@@ -72,7 +74,18 @@ def matching_sim(theta_FOV, M_lim, beta):
 
     ### Simulation ###
     with open(path, "w") as f:
-        header = ["index", "N_obs", "N_match", "N_candi", "unique", "included"]
+        header = [
+            "index",
+            "alpha_obs",
+            "delta_obs",
+            "l_obs",
+            "b_obs",
+            "N_obs",
+            "N_match",
+            "N_candi",
+            "unique",
+            "included",
+        ]
         for data in header[:-1]:
             f.write(f"{data},")
         f.write(f"{header[-1]}\n")
@@ -81,9 +94,11 @@ def matching_sim(theta_FOV, M_lim, beta):
     for i in range(N_loop):
         print(f"\r{os.path.basename(path)[:-3]} : {i}/{N_loop}", end="")
         ### Observed stars ###
-        s_vec_hat, obs_HR = get_random_stars(
+        s_vec_hat, obs_HR, obs_vec = get_random_stars(
             D_DB_OBS, np_random, theta_FOV, beta, epsilon
         )
+        alpha_obs, delta_obs = vec2equatorial(obs_vec)
+        l_obs, b_obs = equatorial2galactic(alpha_obs, delta_obs)
         ### Matching ###
         candi_IDs, obs_IDs, info = matching.match_stars(
             s_vec_hat, np_random, with_check=False
@@ -99,7 +114,20 @@ def matching_sim(theta_FOV, M_lim, beta):
             included.append(set(obs_HR[obs_IDs]) == set(D_DB_HR[candi_ID]))
         included = any(included)
         ### Save result ###
-        log_list.append([i, N_obs, N_match, N_candi, unique, included])
+        log_list.append(
+            [
+                i,
+                alpha_obs,
+                delta_obs,
+                l_obs,
+                b_obs,
+                N_obs,
+                N_match,
+                N_candi,
+                unique,
+                included,
+            ]
+        )
         # save
         freq = 10
         if (i % freq == 0) and (i != 0):
@@ -118,12 +146,14 @@ def get_random_stars(
     beta,
     epsilon,
 ):
-    s_vec = D_DB.get_df()[["s_X", "s_Y", "s_Z"]].to_numpy()
+    s_vec = D_DB.get_s_vec()
     N_obs = len(s_vec)
     ### Observed stars ###
-    # random rotation
+    # random rotation'
     R = special_ortho_group.rvs(dim=3, size=1, random_state=np_random)
     R_s_vec = np.dot(R, s_vec.T).T
+    ez = np.array([0, 0, 1])
+    ezR = np.dot(ez, R)
     # FOV condition
     cond_1 = R_s_vec[:, 2] > 0.0
     temp = np.tan(theta_FOV / 2.0) * R_s_vec[:, 2]
@@ -152,7 +182,7 @@ def get_random_stars(
         s_vec_hat = rotate_(R_s_vec, obs_noise[np.newaxis, :])
     else:
         s_vec_hat = rotate_(R_s_vec, obs_noise)
-    return s_vec_hat, obs_HR
+    return s_vec_hat, obs_HR, ezR
 
 
 def rotate_(R, vec):

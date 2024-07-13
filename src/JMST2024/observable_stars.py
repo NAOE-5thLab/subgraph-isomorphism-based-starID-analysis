@@ -47,16 +47,18 @@ def count_sim_ideal(theta_FOV, M_lim):
     D_DB.filtering_by_multiple_stars(theta_min)
     D_DB.filtering_by_visual_magnitude(M_lim)
     D_DB.get_info()
-    df_D_DB = D_DB.get_df()
 
     ### Simulation ###
-    s_vec = df_D_DB[["s_X", "s_Y", "s_Z"]].to_numpy()
+    s_vec = D_DB.get_s_vec()
     obs_stars_N = []
     for i in range(N_loop):
         print(f"\r{i}/{N_loop}", end="")
         # random rotation
         R = special_ortho_group.rvs(dim=3, size=N_batch, random_state=np_random)
         R_s_vec = rotate(R, s_vec)
+        R_s_vec = np.dot(R, s_vec.T).T
+        ez = np.array([0, 0, 1])
+        ezR = np.dot(ez, R)
         # FOV condition
         cond_1 = R_s_vec[:, :, 2] > 0.0
         temp = np.tan(theta_FOV / 2.0) * R_s_vec[:, :, 2]
