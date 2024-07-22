@@ -64,7 +64,7 @@ class PairDatabase:
         DE2 = self.D_DB["DE [rad]"].to_numpy()[p_index[:, 1]]
         inter_angles = inter_star_angle_RADE(RA1, DE1, RA2, DE2)
         # Pairs in theta_max
-        flag_theta_max = inter_angles < theta_max
+        flag_theta_max = inter_angles <= theta_max
         angles_filtered = inter_angles[flag_theta_max]
         pair_index_filtered = p_index[flag_theta_max]
         return angles_filtered, pair_index_filtered
@@ -76,8 +76,8 @@ class PairDatabase:
         return self.angles_filtered
 
     def get_interval_index(self, y_lower_bound, y_upper_bound):
-        lower_erase = y_lower_bound < self.s_vector
-        upper_erase = self.s_vector < y_upper_bound
+        lower_erase = y_lower_bound <= self.s_vector
+        upper_erase = self.s_vector <= y_upper_bound
         clip = lower_erase * upper_erase
         interval_index = self.i_vector[clip]
         return interval_index

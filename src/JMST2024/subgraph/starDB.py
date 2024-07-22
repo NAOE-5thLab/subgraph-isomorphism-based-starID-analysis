@@ -18,7 +18,7 @@ class StarDatabase:
 
     def filtering_by_visual_magnitude(self, M_lim, lb=None):
         if lb is not None:
-            self.DB_flag *= lb < self.D_C["Vmag [mag]"].to_numpy()
+            self.DB_flag *= lb <= self.D_C["Vmag [mag]"].to_numpy()
         self.DB_flag *= self.D_C["Vmag [mag]"].to_numpy() < M_lim
         self.D_DB = self.D_C[self.DB_flag]
 
@@ -30,7 +30,7 @@ class StarDatabase:
         RA2 = self.D_C["RA [rad]"].to_numpy()[p_index[:, 1]]
         DE2 = self.D_C["DE [rad]"].to_numpy()[p_index[:, 1]]
         inter_angles = inter_star_angle_RADE(RA1, DE1, RA2, DE2)
-        multi_index = np.unique(p_index[inter_angles < theta_max].flatten())
+        multi_index = np.unique(p_index[inter_angles <= theta_max].flatten())
         self.DB_flag[multi_index] = False
         self.D_DB = self.D_C[self.DB_flag]
 
