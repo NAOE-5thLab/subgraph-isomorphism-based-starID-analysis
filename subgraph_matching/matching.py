@@ -18,7 +18,6 @@ class SubgraphIsomorphismBasedMatching:
         D_DB: StarDatabase,
         P_DB: PairDatabase,
         eps: float,
-        np_random: np.random.Generator = None,
     ) -> None:
         """
         Initialize the SubgraphIsomorphismBasedMatching class.
@@ -31,9 +30,8 @@ class SubgraphIsomorphismBasedMatching:
         self.D_DB = D_DB
         self.P_DB = P_DB
         self.eps = eps
-        self.np_random = np.random.default_rng() if np_random is None else np_random
 
-    def match_stars(self, s_hat_list: list, with_check: bool = False):
+    def match_stars(self, s_hat_list: list, seed: int = None, with_check: bool = False):
         """
         Match stars based on the given list of star vectors.
 
@@ -44,13 +42,15 @@ class SubgraphIsomorphismBasedMatching:
         Returns:
             tuple: Candidate star combinations, observation IDs, and matching info.
         """
+        if seed is not None:
+            self.np_random = np.random.default_rng(seed=seed)
         m2to3 = self.match_3_stars_with_matched_2_stars
         mp1top = self.match_p_stars_with_matched_pminus1_stars
         #
         info = ""
         if len(s_hat_list) == 0:
             return [], [], "Given no star"
-        for obs_IDs, pattern in self.pattern_shuffling(s_hat_list):
+        for obs_IDs, pattern in self.increasing_pattern_generator(s_hat_list):
             p = len(pattern)
             if p == 1:
                 candi_pcombIDs = [[i] for i in range(len(self.D_DB.D_DB))]
@@ -237,9 +237,9 @@ class SubgraphIsomorphismBasedMatching:
             candi_pminus1combIDs = candi_pcombIDs
         return candi_pcombIDs
 
-    def pattern_shuffling(self, pattern: list):
+    def increasing_pattern_generator(self, pattern: list):
         """
-        Shuffle the pattern list.
+        Generate increasing patterns.
 
         Args:
             pattern (list): List of patterns.
@@ -252,11 +252,14 @@ class SubgraphIsomorphismBasedMatching:
         selected_pattern = []
         remained_index = list(range(N))
         for n in range(N):
-            i = self.np_random.choice(remained_index)
+            if hasattr(self, "np_random"):
+                i = self.np_random.choice(remained_index)
+            else:
+                i = remained_index[0]
             selected_index.append(i)
             selected_pattern.append(pattern[i])
             remained_index.remove(i)
-            yield selected_index, selected_pattern
+            yield selected_index.copy(), selected_pattern.copy()
 
     def check_matching_result(self, candi_pcombIDs, s_hat_list):
         """
