@@ -6,7 +6,7 @@ import multiprocessing
 import numpy as np
 from scipy.stats import special_ortho_group
 
-from subgraph import (
+from subgraph_matching import (
     YaleStarCatalog,
     StarDatabase,
     PairDatabase,

@@ -4,7 +4,7 @@ import numpy as np
 from scipy.stats import special_ortho_group
 from scipy.stats import binom
 
-from subgraph import YaleStarCatalog, StarDatabase
+from subgraph_matching import YaleStarCatalog, StarDatabase
 from utils import *
 
 
