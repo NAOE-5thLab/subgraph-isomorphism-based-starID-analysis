@@ -12,14 +12,16 @@ If you use dataset in a scientific publication, we would appreciate references t
 Biblatex entry:
 
 ```
-@misc{wakita2024conceptualdesignfieldview,
-      title={Conceptual Design on the Field of View of Celestial Navigation Systems for Maritime Autonomous Surface Ships},
-      author={Kouki Wakita and Fuyuki Hane and Takeshi Sekiguchi and Shigehito Shimizu and Shinji Mitani and Youhei Akimoto and Atsuo Maki},
-      year={2024},
-      eprint={2408.15765},
-      archivePrefix={arXiv},
-      primaryClass={cs.RO},
-      url={https://arxiv.org/abs/2408.15765},
+@Article{Wakita2025,
+      author={Wakita, Kouki and Hane, Fuyuki and Sekiguchi, Takeshi and Shimizu, Shigehito and Mitani, Shinji and Akimoto, Youhei and Maki, Atsuo},
+      title={Conceptual design on the field of view of celestial navigation systems for maritime autonomous surface ships},
+      journal={Journal of Marine Science and Technology},
+      year={2025},
+      month={Jun},
+      day={02},
+      issn={1437-8213},
+      doi={10.1007/s00773-025-01064-0},
+      url={https://doi.org/10.1007/s00773-025-01064-0}
 }
 ```
 
